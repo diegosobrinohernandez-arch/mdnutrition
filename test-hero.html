@@ -128,7 +128,15 @@
   // de fondo el resto de los 10s, así que la forzamos siempre a
   // transparente en vez de recortar tiempo del vídeo.
   // ----------------------------------------------------------------
-  const HAND_MASK = { x: 0, y: 0, w: 230, h: 90 };
+  // ----------------------------------------------------------------
+  // En los primeros ~1.2s aparece un trozo de mano en la esquina
+  // superior izquierda. En vez de una máscara con forma e intentar
+  // adivinar el área exacta, cortamos con una línea vertical recta:
+  // todo lo que hay a la izquierda de este punto se oculta siempre,
+  // el resto del vídeo (incluido el vaso) nunca llega tan a la
+  // izquierda, así que nunca se ve afectado.
+  // ----------------------------------------------------------------
+  const HAND_CUT_X = 225; // en coordenadas del vídeo nativo (1440px de ancho)
 
   let duration = 0;
   let targetTime = 0;
@@ -211,32 +219,23 @@
     // nunca hay un filo recto, y si el scoop roza esa zona se desvanece
     // en vez de cortarse en seco.
     const sx = canvasW / video.videoWidth;
-    const sy = canvasH / video.videoHeight;
-    const maskCx = (HAND_MASK.x + HAND_MASK.w * 0.5) * sx;
-    const maskCy = (HAND_MASK.y + HAND_MASK.h * 0.5) * sy;
-    const maskRx = (HAND_MASK.w * 0.5) * sx;
-    const maskRy = (HAND_MASK.h * 0.5) * sy;
-    const FEATHER_INNER = 0.6; // dentro de esto, 100% transparente
-    const FEATHER_OUTER = 1.35; // fuera de esto, sin efecto de máscara
+    const cutX = HAND_CUT_X * sx;
 
     for (let y = 0; y < canvasH; y++) {
-      const ny = (y - maskCy) / maskRy;
       for (let x = 0; x < canvasW; x++) {
         const i = (y * canvasW + x) * 4;
+
+        if (x < cutX) {
+          data[i + 3] = 0;
+          continue;
+        }
+
         const r = data[i], g = data[i + 1], b = data[i + 2];
         const maxRB = Math.max(r, b);
 
         const diff = g - maxRB;
         let alpha = 1 - (diff - SOFTNESS_LO) / (SOFTNESS_HI - SOFTNESS_LO);
         alpha = Math.max(0, Math.min(1, alpha));
-
-        const nx = (x - maskCx) / maskRx;
-        const d = Math.sqrt(nx * nx + ny * ny);
-        if (d < FEATHER_OUTER) {
-          const maskFactor = Math.max(0, Math.min(1, (d - FEATHER_INNER) / (FEATHER_OUTER - FEATHER_INNER)));
-          alpha *= maskFactor;
-        }
-
         data[i + 3] = Math.round(alpha * 255);
 
         if (alpha > 0 && alpha < 1 && g > maxRB) {
