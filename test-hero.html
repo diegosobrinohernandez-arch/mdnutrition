@@ -42,6 +42,7 @@
         <span class="md-logo-main">MD</span>
         <span class="md-logo-sub">NUTRITION</span>
       </div>
+      <div class="md-loading" id="md-loading">Cargando…</div>
     </div>
   </div>
 </section>
@@ -103,6 +104,16 @@
     letter-spacing: 0.18em;
     margin-top: 2px;
   }
+  .md-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    color: #999;
+  }
 </style>
 
 <script>
@@ -136,14 +147,22 @@
   // el resto del vídeo (incluido el vaso) nunca llega tan a la
   // izquierda, así que nunca se ve afectado.
   // ----------------------------------------------------------------
-  const HAND_CUT_X = 225; // en coordenadas del vídeo nativo (1440px de ancho)
-  const RIGHT_CUT_X = 225; // recorte simétrico en el lado derecho, para que la mesa quede igual de recortada en ambos lados
+  // ----------------------------------------------------------------
+  // En los primeros ~1.2s aparece un trozo de mano en la esquina
+  // superior izquierda. Corte vertical recto, simétrico en ambos
+  // lados (el lado derecho no tiene nada que ocultar, es solo para
+  // que la mesa quede igual de recortada en los dos lados).
+  // ----------------------------------------------------------------
+  const HAND_CUT_X = 225;
+  const RIGHT_CUT_X = 225;
 
   let duration = 0;
   let targetTime = 0;
   let renderedTime = -1;
   let rafScheduled = false;
   let canvasW = 0, canvasH = 0;
+
+  const loadingIndicator = document.getElementById('md-loading');
 
   video.addEventListener('loadedmetadata', () => {
     duration = video.duration;
@@ -155,15 +174,21 @@
     // usuario lo note.
     const kickstart = video.play();
     if (kickstart && typeof kickstart.then === 'function') {
-      kickstart.then(() => video.pause()).catch(() => {
+      kickstart.then(() => {
+        video.pause();
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
+        onScroll();
+      }).catch(() => {
         // Si el navegador bloquea el play() automático, igualmente
         // intentamos pintar el primer frame por si ya es legible.
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
         onScroll();
       });
     } else {
       video.pause();
+      if (loadingIndicator) loadingIndicator.style.display = 'none';
+      onScroll();
     }
-    onScroll();
   });
 
   function resizeCanvas() {
@@ -213,10 +238,7 @@
     const frame = ctx.getImageData(0, 0, canvasW, canvasH);
     const data = frame.data;
 
-    // Corte vertical recto a ambos lados: a la izquierda para tapar el
-    // trozo de mano que aparece al inicio, a la derecha en la misma
-    // medida, solo para que la mesa quede recortada por igual en los
-    // dos lados (simetría visual, no hay nada que ocultar ahí).
+    // Corte vertical recto a ambos lados.
     const sx = canvasW / video.videoWidth;
     const cutX = HAND_CUT_X * sx;
     const rightCutX = canvasW - RIGHT_CUT_X * sx;
@@ -238,8 +260,16 @@
         alpha = Math.max(0, Math.min(1, alpha));
         data[i + 3] = Math.round(alpha * 255);
 
-        if (alpha > 0 && alpha < 1 && g > maxRB) {
+        // Si queda cualquier resto de verde (en el borde, o incluso en
+        // píxeles ya opacos como el cristal durante el batido), lo
+        // neutralizamos y además le damos un empuje cálido/rojizo en
+        // vez de dejarlo gris neutro — así cualquier resto que no se
+        // pueda eliminar al 100% encaja con el rojo de marca en vez
+        // de parecer un fallo de croma.
+        if (alpha > 0 && g > maxRB) {
+          const removedGreen = g - maxRB;
           data[i + 1] = maxRB;
+          data[i] = Math.min(255, r + removedGreen * 0.6);
         }
       }
     }
