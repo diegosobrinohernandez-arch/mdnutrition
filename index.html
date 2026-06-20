@@ -438,10 +438,11 @@ canvas#md-output-canvas { display: block; max-width: 100%; max-height: 90svh; }
 .md-logo-overlay {
   position: absolute; top: 68%; left: 50%; transform: translate(-50%, -50%);
   text-align: center; pointer-events: none; opacity: 0; transition: opacity .4s ease;
-  color: #2e2e2e; font-family: Arial, Helvetica, sans-serif; text-shadow: 0 1px 2px rgba(255,255,255,0.4);
+  color: #000000; font-family: Arial, Helvetica, sans-serif;
+  text-shadow: 0 1px 3px rgba(255,255,255,0.6), 0 0 1px rgba(255,255,255,0.6);
 }
-.md-logo-main { display: block; font-size: 2.4rem; font-weight: 700; letter-spacing: 0.05em; line-height: 1; }
-.md-logo-sub { display: block; font-size: 0.9rem; font-weight: 500; letter-spacing: 0.18em; margin-top: 2px; }
+.md-logo-main { display: block; font-size: 2.4rem; font-weight: 900; letter-spacing: 0.05em; line-height: 1; -webkit-text-stroke: 0.5px rgba(0,0,0,0.3); }
+.md-logo-sub { display: block; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.2em; margin-top: 2px; }
 .md-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: Arial, Helvetica, sans-serif; font-size: 0.85rem; letter-spacing: 0.05em; color: var(--muted); }
 
 @media (max-width: 900px) {
