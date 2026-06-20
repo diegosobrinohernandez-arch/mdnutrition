@@ -118,8 +118,8 @@
   // (md-shaker-final.mp4). Si cambias de vídeo, vuelve a medir
   // el verde y actualiza estos 3 números.
   // ----------------------------------------------------------------
-  const SOFTNESS_LO = 10;  // por debajo de esto, se considera producto (opaco)
-  const SOFTNESS_HI = 55;  // por encima de esto, se considera fondo (transparente)
+  const SOFTNESS_LO = 5;   // por debajo de esto, se considera producto (opaco)
+  const SOFTNESS_HI = 40;  // por encima de esto, se considera fondo (transparente)
 
   // ----------------------------------------------------------------
   // En los primeros ~1.2s del vídeo aparece un trozo de mano en la
@@ -204,31 +204,39 @@
     const frame = ctx.getImageData(0, 0, canvasW, canvasH);
     const data = frame.data;
 
-    // Escalamos el rectángulo de la mano (medido en coordenadas del
-    // vídeo nativo 1440x1440) al tamaño real del canvas en pantalla.
+    // Máscara de la mano: en vez de un rectángulo duro (que se veía
+    // como un corte recto poco natural), usamos un óvalo con borde
+    // difuminado — transparente del todo en el centro de la esquina,
+    // y se funde suavemente hacia el resultado normal del croma. Así
+    // nunca hay un filo recto, y si el scoop roza esa zona se desvanece
+    // en vez de cortarse en seco.
     const sx = canvasW / video.videoWidth;
     const sy = canvasH / video.videoHeight;
-    const maskX1 = HAND_MASK.x * sx, maskX2 = (HAND_MASK.x + HAND_MASK.w) * sx;
-    const maskY1 = HAND_MASK.y * sy, maskY2 = (HAND_MASK.y + HAND_MASK.h) * sy;
+    const maskCx = (HAND_MASK.x + HAND_MASK.w * 0.5) * sx;
+    const maskCy = (HAND_MASK.y + HAND_MASK.h * 0.5) * sy;
+    const maskRx = (HAND_MASK.w * 0.5) * sx;
+    const maskRy = (HAND_MASK.h * 0.5) * sy;
+    const FEATHER_INNER = 0.6; // dentro de esto, 100% transparente
+    const FEATHER_OUTER = 1.35; // fuera de esto, sin efecto de máscara
 
     for (let y = 0; y < canvasH; y++) {
-      const inMaskRow = y >= maskY1 && y <= maskY2;
+      const ny = (y - maskCy) / maskRy;
       for (let x = 0; x < canvasW; x++) {
         const i = (y * canvasW + x) * 4;
-        if (inMaskRow && x >= maskX1 && x <= maskX2) {
-          data[i + 3] = 0; // forzado a transparente, sin mirar el color
-          continue;
-        }
-
         const r = data[i], g = data[i + 1], b = data[i + 2];
         const maxRB = Math.max(r, b);
 
-        // "Cuánto más verde que rojo/azul" tiene el pixel, en vez de
-        // distancia a un color de croma fijo — más estable ante brillos
-        // y reflejos del cristal sobre el fondo verde.
         const diff = g - maxRB;
         let alpha = 1 - (diff - SOFTNESS_LO) / (SOFTNESS_HI - SOFTNESS_LO);
         alpha = Math.max(0, Math.min(1, alpha));
+
+        const nx = (x - maskCx) / maskRx;
+        const d = Math.sqrt(nx * nx + ny * ny);
+        if (d < FEATHER_OUTER) {
+          const maskFactor = Math.max(0, Math.min(1, (d - FEATHER_INNER) / (FEATHER_OUTER - FEATHER_INNER)));
+          alpha *= maskFactor;
+        }
+
         data[i + 3] = Math.round(alpha * 255);
 
         if (alpha > 0 && alpha < 1 && g > maxRB) {
