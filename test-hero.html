@@ -137,6 +137,7 @@
   // izquierda, así que nunca se ve afectado.
   // ----------------------------------------------------------------
   const HAND_CUT_X = 225; // en coordenadas del vídeo nativo (1440px de ancho)
+  const RIGHT_CUT_X = 225; // recorte simétrico en el lado derecho, para que la mesa quede igual de recortada en ambos lados
 
   let duration = 0;
   let targetTime = 0;
@@ -212,20 +213,19 @@
     const frame = ctx.getImageData(0, 0, canvasW, canvasH);
     const data = frame.data;
 
-    // Máscara de la mano: en vez de un rectángulo duro (que se veía
-    // como un corte recto poco natural), usamos un óvalo con borde
-    // difuminado — transparente del todo en el centro de la esquina,
-    // y se funde suavemente hacia el resultado normal del croma. Así
-    // nunca hay un filo recto, y si el scoop roza esa zona se desvanece
-    // en vez de cortarse en seco.
+    // Corte vertical recto a ambos lados: a la izquierda para tapar el
+    // trozo de mano que aparece al inicio, a la derecha en la misma
+    // medida, solo para que la mesa quede recortada por igual en los
+    // dos lados (simetría visual, no hay nada que ocultar ahí).
     const sx = canvasW / video.videoWidth;
     const cutX = HAND_CUT_X * sx;
+    const rightCutX = canvasW - RIGHT_CUT_X * sx;
 
     for (let y = 0; y < canvasH; y++) {
       for (let x = 0; x < canvasW; x++) {
         const i = (y * canvasW + x) * 4;
 
-        if (x < cutX) {
+        if (x < cutX || x > rightCutX) {
           data[i + 3] = 0;
           continue;
         }
