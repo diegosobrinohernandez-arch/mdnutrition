@@ -467,44 +467,16 @@ canvas#md-output-canvas { display: block; width: 100%; height: auto; }
   text-align: center;
 }
 
-.shaker-mobile-caption {
-  display: none;
-  text-align: center;
-  margin-top: 12px;
-}
-.shaker-mobile-brand {
-  display: block;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 900;
-  font-size: 22px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--white);
-}
-.shaker-mobile-sub {
-  display: block;
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
 @media (max-width: 1050px) {
-  .catalog-with-shaker { grid-template-columns: 1fr; }
+  .catalog-with-shaker {
+    grid-template-columns: 1fr;
+  }
   .catalog-shaker-col {
     position: static;
     order: -1;
-    width: 60%;
-    max-width: 280px;
-    margin: 0 auto 32px;
-  }
-  .catalog-shaker-col .md-logo-overlay { display: none; }
-  .shaker-mobile-caption { display: block; }
-}
-
-@media (max-width: 600px) {
-  .catalog-shaker-col {
-    width: 70%;
-    max-width: 240px;
+    width: 55%;
+    max-width: 260px;
+    margin: 0 auto 28px;
   }
 }
 
@@ -868,7 +840,7 @@ footer {
 
       <!-- Columna derecha: shaker sticky que baja con los productos -->
       <div class="catalog-shaker-col">
-        <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto"></video>
+        <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto" loop></video>
         <div class="chroma-canvas-holder" id="chroma-canvas-holder">
           <canvas id="md-output-canvas"></canvas>
           <div class="md-logo-overlay" id="md-logo-overlay">
@@ -876,10 +848,6 @@ footer {
             <span class="md-logo-sub">NUTRITION</span>
           </div>
           <div class="md-loading" id="md-loading">Cargando…</div>
-        </div>
-        <div class="shaker-mobile-caption">
-          <span class="shaker-mobile-brand">MD NUTRITION</span>
-          <span class="shaker-mobile-sub">Suplementos que funcionan de verdad</span>
         </div>
       </div>
     </div>
@@ -1155,7 +1123,7 @@ buildChips();
 render();
 </script>
 
-<!-- ── SHAKER ANIMADO (scroll-driven por catálogo) ─────────────────────── -->
+<!-- ── SHAKER ANIMADO (autoplay loop) ─────────────────────── -->
 <script>
 (() => {
   const video = document.getElementById('md-source-video');
@@ -1164,7 +1132,6 @@ render();
   const stageHolder = document.getElementById('chroma-canvas-holder');
   const logoOverlay = document.getElementById('md-logo-overlay');
   const loadingIndicator = document.getElementById('md-loading');
-  const catalogSection = document.getElementById('catalogo');
 
   const SOFTNESS_LO = 5;
   const SOFTNESS_HI = 40;
@@ -1172,11 +1139,8 @@ render();
   const RIGHT_CUT_X = 225;
 
   let canvasW = 0, canvasH = 0;
-  let duration = 0;
-  let targetTime = 0;
-  let renderedTime = -1;
-  let rafScheduled = false;
-  let ready = false;
+  let rafId = null;
+  let playing = false;
 
   function resizeCanvas() {
     if (!video.videoWidth) return;
@@ -1217,62 +1181,30 @@ render();
     ctx.putImageData(frame, 0, 0);
   }
 
-  function isMobile() { return window.innerWidth <= 1050; }
-
-  function onScroll() {
-    if (!ready || !duration) return;
-    if (isMobile()) return; // en móvil frame estático, no scroll
-    const rect = catalogSection.getBoundingClientRect();
-    const total = catalogSection.offsetHeight - window.innerHeight;
-    const scrolled = -rect.top;
-    let progress = Math.max(0, Math.min(1, scrolled / total));
-    targetTime = progress * duration;
-    logoOverlay.style.opacity = progress > 0.4 ? '1' : '0';
-    scheduleSeek();
+  function renderLoop() {
+    drawKeyedFrame();
+    rafId = requestAnimationFrame(renderLoop);
   }
 
-  function scheduleSeek() {
-    if (rafScheduled) return;
-    rafScheduled = true;
-    requestAnimationFrame(() => {
-      rafScheduled = false;
-      if (Math.abs(targetTime - renderedTime) > 1 / 30) {
-        renderedTime = targetTime;
-        video.currentTime = targetTime;
-      }
-    });
-  }
-
-  video.addEventListener('seeked', drawKeyedFrame);
-
-  function init() {
-    if (ready) return;
-    if (video.readyState < 2) return;
-    ready = true;
-    duration = video.duration;
+  function start() {
+    if (playing) return;
+    playing = true;
+    resizeCanvas();
+    if (loadingIndicator) loadingIndicator.style.display = 'none';
+    logoOverlay.style.opacity = '1';
     const p = video.play();
-    const finish = () => {
-      video.pause();
-      if (loadingIndicator) loadingIndicator.style.display = 'none';
-      resizeCanvas();
-      if (isMobile()) {
-        // Frame estático: mitad del vídeo donde el shaker ya está lleno
-        video.currentTime = duration * 0.6;
-      } else {
-        onScroll();
-      }
-    };
-    if (p && typeof p.then === 'function') { p.then(finish).catch(finish); } else { finish(); }
+    const go = () => { if (!rafId) renderLoop(); };
+    if (p && typeof p.then === 'function') { p.then(go).catch(go); } else { go(); }
   }
 
-  video.addEventListener('loadeddata', init);
-  video.addEventListener('canplay', init);
-  const poll = setInterval(() => { if (ready) { clearInterval(poll); return; } init(); }, 300);
+  video.addEventListener('canplay', start);
+  video.addEventListener('loadeddata', start);
+  const poll = setInterval(() => {
+    if (playing) { clearInterval(poll); return; }
+    if (video.readyState >= 3) { clearInterval(poll); start(); }
+  }, 200);
 
-  video.addEventListener('loadedmetadata', () => { duration = video.duration; });
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', () => { resizeCanvas(); drawKeyedFrame(); });
+  window.addEventListener('resize', () => { resizeCanvas(); });
 })();
 </script>
 
