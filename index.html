@@ -814,9 +814,9 @@ footer {
       <p class="section-desc">539 productos reales de las mejores marcas: Life Pro, Amix, Big, Vit O Best, Weider y más. Filtra por marca o categoría y consulta disponibilidad directamente por WhatsApp.</p>
     </div>
 
-    <!-- Zona dos columnas: filtros | shaker -->
+    <!-- Layout dos columnas: izquierda (filtros+productos) | derecha shaker sticky -->
     <div class="catalog-with-shaker">
-      <!-- Columna izquierda: buscador + marcas + chips -->
+      <!-- Columna izquierda: filtros + grid productos -->
       <div class="catalog-filters">
         <div class="cat-toolbar">
           <div class="cat-search">
@@ -826,9 +826,11 @@ footer {
         </div>
         <div class="brand-row" id="brandRow"></div>
         <div class="cat-chips" id="catChips"></div>
+        <p class="cat-count" id="catCount"></p>
+        <div id="catResults"></div>
       </div>
 
-      <!-- Columna derecha: shaker sticky -->
+      <!-- Columna derecha: shaker sticky que baja con los productos -->
       <div class="catalog-shaker-col">
         <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto"></video>
         <div class="chroma-canvas-holder" id="chroma-canvas-holder">
@@ -841,10 +843,6 @@ footer {
         </div>
       </div>
     </div>
-
-    <!-- Grid de productos: ancho completo -->
-    <p class="cat-count" id="catCount"></p>
-    <div id="catResults"></div>
   </div>
 </div>
 
