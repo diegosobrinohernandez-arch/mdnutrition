@@ -426,23 +426,13 @@ body { background: var(--bg); color: var(--white); font-family: 'Inter', system-
 .btn-outline:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
 .btn-outline svg { width: 20px; height: 20px; }
 
-/* ── PRODUCTO ANIMADO (vídeo croma con scroll) ───────── */
-.chroma-stage-wrapper {
-  position: relative;
-  height: 300vh;
-  background: var(--bg);
-}
-.chroma-stage {
-  position: sticky; top: 0; height: 100svh; width: 100%;
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-}
+/* ── PRODUCTO ANIMADO (inline catálogo) ───────── */
 video#md-source-video { display: none; }
-.chroma-canvas-holder { position: relative; max-width: 90%; max-height: 85svh; }
-canvas#md-output-canvas { display: block; max-width: 100%; max-height: 85svh; }
+.chroma-canvas-holder { position: relative; width: 100%; }
+canvas#md-output-canvas { display: block; width: 100%; height: auto; }
 .md-logo-overlay {
   position: absolute; top: 68%; left: 50%; transform: translate(-50%, -50%);
-  text-align: center; pointer-events: none; opacity: 0; transition: opacity .4s ease;
+  text-align: center; pointer-events: none; opacity: 1; transition: opacity .4s ease;
   color: #000000; font-family: Arial, Helvetica, sans-serif;
   text-shadow: 0 1px 3px rgba(255,255,255,0.6), 0 0 1px rgba(255,255,255,0.6);
 }
@@ -450,12 +440,36 @@ canvas#md-output-canvas { display: block; max-width: 100%; max-height: 85svh; }
 .md-logo-sub { display: block; font-size: 1rem; font-weight: 700; letter-spacing: 0.2em; margin-top: 2px; }
 .md-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: Arial, Helvetica, sans-serif; font-size: 0.85rem; letter-spacing: 0.05em; color: var(--muted); }
 
-@media (max-width: 900px) {
-  .chroma-stage-wrapper { height: 220vh; }
-  .chroma-canvas-holder { max-width: 96%; max-height: 75svh; }
-  canvas#md-output-canvas { max-height: 75svh; }
-  .md-logo-main { font-size: clamp(1.8rem, 9vw, 2.6rem); }
-  .md-logo-sub { font-size: clamp(0.7rem, 3vw, 1rem); }
+/* ── CATALOG CON SHAKER LATERAL ───────── */
+.catalog-with-shaker {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 40px;
+  align-items: start;
+  margin-bottom: 32px;
+}
+.catalog-filters { min-width: 0; }
+.catalog-shaker-col {
+  position: sticky;
+  top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.shaker-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+@media (max-width: 1050px) {
+  .catalog-with-shaker { grid-template-columns: 1fr; }
+  .catalog-shaker-col { display: none; }
 }
 
 /* ── TRUST BAR ───────────────────────────── */
@@ -768,21 +782,6 @@ footer {
   </div>
 </section>
 
-<!-- PRODUCTO ANIMADO -->
-<section class="chroma-stage-wrapper" id="chromaStageWrapper">
-  <div class="chroma-stage">
-    <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto"></video>
-    <div class="chroma-canvas-holder" id="chroma-canvas-holder">
-      <canvas id="md-output-canvas"></canvas>
-      <div class="md-logo-overlay" id="md-logo-overlay">
-        <span class="md-logo-main">MD</span>
-        <span class="md-logo-sub">NUTRITION</span>
-      </div>
-      <div class="md-loading" id="md-loading">Cargando…</div>
-    </div>
-  </div>
-</section>
-
 <!-- TRUST BAR -->
 <div class="trust-bar">
   <div class="trust-item"><span class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FCD34D"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span><div class="trust-text"><strong>5.0 Google</strong><span>+135 reseñas verificadas</span></div></div>
@@ -815,17 +814,37 @@ footer {
       <p class="section-desc">539 productos reales de las mejores marcas: Life Pro, Amix, Big, Vit O Best, Weider y más. Filtra por marca o categoría y consulta disponibilidad directamente por WhatsApp.</p>
     </div>
 
-    <div class="cat-toolbar">
-      <div class="cat-search">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3" stroke-linecap="round"></path></svg>
-        <input type="text" id="catSearch" placeholder="Buscar producto…" autocomplete="off">
+    <!-- Zona dos columnas: filtros | shaker -->
+    <div class="catalog-with-shaker">
+      <!-- Columna izquierda: buscador + marcas + chips -->
+      <div class="catalog-filters">
+        <div class="cat-toolbar">
+          <div class="cat-search">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3" stroke-linecap="round"></path></svg>
+            <input type="text" id="catSearch" placeholder="Buscar producto…" autocomplete="off">
+          </div>
+        </div>
+        <div class="brand-row" id="brandRow"></div>
+        <div class="cat-chips" id="catChips"></div>
+      </div>
+
+      <!-- Columna derecha: shaker sticky -->
+      <div class="catalog-shaker-col">
+        <span class="shaker-label">Mezclado en Madrid</span>
+        <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto" loop></video>
+        <div class="chroma-canvas-holder" id="chroma-canvas-holder">
+          <canvas id="md-output-canvas"></canvas>
+          <div class="md-logo-overlay" id="md-logo-overlay">
+            <span class="md-logo-main">MD</span>
+            <span class="md-logo-sub">NUTRITION</span>
+          </div>
+          <div class="md-loading" id="md-loading">Cargando…</div>
+        </div>
       </div>
     </div>
 
-    <div class="brand-row" id="brandRow"></div>
-    <div class="cat-chips" id="catChips"></div>
+    <!-- Grid de productos: ancho completo -->
     <p class="cat-count" id="catCount"></p>
-
     <div id="catResults"></div>
   </div>
 </div>
@@ -1099,112 +1118,35 @@ buildChips();
 render();
 </script>
 
-<!-- ── HERO CHROMA VIDEO ─────────────────────── -->
+<!-- ── SHAKER ANIMADO (autoplay loop) ─────────────────────── -->
 <script>
 (() => {
   const video = document.getElementById('md-source-video');
   const canvas = document.getElementById('md-output-canvas');
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  const wrapper = document.getElementById('chromaStageWrapper');
   const stageHolder = document.getElementById('chroma-canvas-holder');
   const logoOverlay = document.getElementById('md-logo-overlay');
   const loadingIndicator = document.getElementById('md-loading');
 
-  // Color de croma medido sobre md-shaker-final.mp4. Si se cambia de vídeo,
-  // hay que volver a medir el verde y reajustar estos 2 números.
   const SOFTNESS_LO = 5;
   const SOFTNESS_HI = 40;
-
-  // Corte vertical recto a ambos lados para ocultar el trozo de mano que
-  // aparece en los primeros ~1.2s en la esquina superior izquierda.
   const HAND_CUT_X = 225;
   const RIGHT_CUT_X = 225;
 
-  let duration = 0;
-  let targetTime = 0;
-  let renderedTime = -1;
-  let rafScheduled = false;
   let canvasW = 0, canvasH = 0;
-
-  video.addEventListener('loadedmetadata', () => {
-    duration = video.duration;
-    resizeCanvas();
-  });
-
-  let firstFrameDone = false;
-
-  function initFirstFrame() {
-    if (firstFrameDone) return;
-    if (video.readyState < 2) return; // todavía no hay datos suficientes, no insistimos en falso
-    firstFrameDone = true;
-    // En móvil muchos navegadores no decodifican el vídeo para canvas
-    // hasta que se ha intentado reproducir un instante.
-    const kickstart = video.play();
-    const finish = () => {
-      video.pause();
-      if (loadingIndicator) loadingIndicator.style.display = 'none';
-      resizeCanvas();
-      drawKeyedFrame();
-      onScroll();
-    };
-    if (kickstart && typeof kickstart.then === 'function') {
-      kickstart.then(finish).catch(finish);
-    } else {
-      finish();
-    }
-  }
-
-  // Varios disparadores en paralelo, y además reintentamos cada 300ms
-  // por si ningún evento llega a disparar en algún navegador. No hay
-  // límite de intentos: si la conexión va lenta, seguimos esperando
-  // con el "Cargando…" visible en vez de rendirnos con un cuadro en
-  // blanco que ya no se actualiza nunca.
-  video.addEventListener('loadeddata', initFirstFrame);
-  video.addEventListener('canplay', initFirstFrame);
-  const readyPoll = setInterval(() => {
-    if (firstFrameDone) { clearInterval(readyPoll); return; }
-    initFirstFrame();
-  }, 300);
+  let rafId = null;
+  let isPlaying = false;
 
   function resizeCanvas() {
     if (!video.videoWidth) return;
-    const rect = stageHolder.parentElement.getBoundingClientRect();
-    const maxSize = Math.min(rect.width, rect.height) * 0.95;
-    const scale = maxSize / Math.max(video.videoWidth, video.videoHeight);
+    const rect = stageHolder.getBoundingClientRect();
+    const w = rect.width || 320;
+    const scale = w / video.videoWidth;
     canvasW = Math.round(video.videoWidth * scale);
     canvasH = Math.round(video.videoHeight * scale);
     canvas.width = canvasW;
     canvas.height = canvasH;
   }
-
-  function onScroll() {
-    if (!duration) return;
-    const rect = wrapper.getBoundingClientRect();
-    const total = wrapper.offsetHeight - window.innerHeight;
-    const scrolled = -rect.top;
-    let progress = scrolled / total;
-    progress = Math.max(0, Math.min(1, progress));
-    targetTime = progress * duration;
-
-    // El logo aparece a partir de que el batido ya se está mezclando
-    logoOverlay.style.opacity = progress > 0.55 ? '1' : '0';
-
-    scheduleSeek();
-  }
-
-  function scheduleSeek() {
-    if (rafScheduled) return;
-    rafScheduled = true;
-    requestAnimationFrame(() => {
-      rafScheduled = false;
-      if (Math.abs(targetTime - renderedTime) > 1 / 30) {
-        renderedTime = targetTime;
-        video.currentTime = targetTime;
-      }
-    });
-  }
-
-  video.addEventListener('seeked', drawKeyedFrame);
 
   function drawKeyedFrame() {
     if (!canvasW) return;
@@ -1219,19 +1161,13 @@ render();
     for (let y = 0; y < canvasH; y++) {
       for (let x = 0; x < canvasW; x++) {
         const i = (y * canvasW + x) * 4;
-
-        if (x < cutX || x > rightCutX) {
-          data[i + 3] = 0;
-          continue;
-        }
-
+        if (x < cutX || x > rightCutX) { data[i + 3] = 0; continue; }
         const r = data[i], g = data[i + 1], b = data[i + 2];
         const maxRB = Math.max(r, b);
         const diff = g - maxRB;
         let alpha = 1 - (diff - SOFTNESS_LO) / (SOFTNESS_HI - SOFTNESS_LO);
         alpha = Math.max(0, Math.min(1, alpha));
         data[i + 3] = Math.round(alpha * 255);
-
         if (alpha > 0 && g > maxRB) {
           const removedGreen = g - maxRB;
           data[i + 1] = maxRB;
@@ -1239,12 +1175,34 @@ render();
         }
       }
     }
-
     ctx.putImageData(frame, 0, 0);
   }
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', () => { resizeCanvas(); drawKeyedFrame(); });
+  function renderLoop() {
+    drawKeyedFrame();
+    // Logo aparece siempre visible en modo inline
+    logoOverlay.style.opacity = '1';
+    rafId = requestAnimationFrame(renderLoop);
+  }
+
+  function startPlayback() {
+    if (isPlaying) return;
+    resizeCanvas();
+    if (loadingIndicator) loadingIndicator.style.display = 'none';
+    const p = video.play();
+    const go = () => { isPlaying = true; if (!rafId) renderLoop(); };
+    if (p && typeof p.then === 'function') { p.then(go).catch(go); } else { go(); }
+  }
+
+  // Arrancar en cuanto haya datos — varios disparadores por compatibilidad
+  video.addEventListener('canplay', startPlayback);
+  video.addEventListener('loadeddata', startPlayback);
+  // Fallback poll por si los eventos no disparan (Safari, Chrome móvil)
+  const poll = setInterval(() => {
+    if (video.readyState >= 3) { clearInterval(poll); startPlayback(); }
+  }, 200);
+
+  window.addEventListener('resize', () => { resizeCanvas(); });
 })();
 </script>
 
