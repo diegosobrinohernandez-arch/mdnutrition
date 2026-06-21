@@ -450,8 +450,6 @@ canvas#md-output-canvas { display: block; width: 100%; height: auto; }
 }
 .catalog-filters { min-width: 0; }
 .catalog-shaker-col {
-  position: sticky;
-  top: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -818,9 +816,9 @@ footer {
       <p class="section-desc">539 productos reales de las mejores marcas: Life Pro, Amix, Big, Vit O Best, Weider y más. Filtra por marca o categoría y consulta disponibilidad directamente por WhatsApp.</p>
     </div>
 
-    <!-- Layout dos columnas: izquierda (filtros+productos) | derecha shaker sticky -->
+    <!-- Layout dos columnas: solo filtros | shaker -->
     <div class="catalog-with-shaker">
-      <!-- Columna izquierda: filtros + grid productos -->
+      <!-- Columna izquierda: buscador + marcas + chips -->
       <div class="catalog-filters">
         <div class="cat-toolbar">
           <div class="cat-search">
@@ -830,11 +828,9 @@ footer {
         </div>
         <div class="brand-row" id="brandRow"></div>
         <div class="cat-chips" id="catChips"></div>
-        <p class="cat-count" id="catCount"></p>
-        <div id="catResults"></div>
       </div>
 
-      <!-- Columna derecha: shaker sticky que baja con los productos -->
+      <!-- Columna derecha: shaker estático -->
       <div class="catalog-shaker-col">
         <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto" loop></video>
         <div class="chroma-canvas-holder" id="chroma-canvas-holder">
@@ -847,6 +843,10 @@ footer {
         </div>
       </div>
     </div>
+
+    <!-- Productos: ancho completo -->
+    <p class="cat-count" id="catCount"></p>
+    <div id="catResults"></div>
   </div>
 </div>
 
