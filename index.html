@@ -399,68 +399,63 @@ body { background: var(--bg); color: var(--white); font-family: 'Inter', system-
 .mobile-menu.open { display: flex; }
 
 /* ── HERO ────────────────────────────────── */
-.hero-split-wrapper {
-  position: relative;
-  height: 400vh;
+.hero {
+  min-height: 100svh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 80px 24px 60px;
   background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(220,38,38,0.12) 0%, transparent 70%), var(--bg);
+  position: relative; overflow: hidden;
 }
-.hero-split-sticky {
-  position: sticky; top: 0; height: 100svh; width: 100%;
-  display: grid; grid-template-columns: 1fr 1fr; align-items: center;
-  overflow: hidden; padding: 0 24px;
-}
-.hero-split-sticky::before {
+.hero::before {
   content: ''; position: absolute; inset: 0;
   background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
   background-size: 32px 32px; pointer-events: none;
 }
-.hero-text { position: relative; z-index: 2; text-align: left; padding-right: 24px; }
-.hero-logo { width: 96px; height: 96px; margin-bottom: 24px; object-fit: contain; filter: drop-shadow(0 0 40px rgba(220,38,38,0.5)); }
-.hero-text h1 {
+.hero-logo { width: 220px; height: 220px; margin-bottom: 32px; object-fit: contain; filter: drop-shadow(0 0 60px rgba(220,38,38,0.5)); }
+.hero h1 {
   font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic;
-  font-size: clamp(36px, 6vw, 64px); line-height: 1; text-transform: uppercase;
-  max-width: 480px;
+  font-size: clamp(42px, 8vw, 80px); line-height: 1; text-transform: uppercase;
+  max-width: 800px;
 }
-.hero-text h1 em { color: var(--red); font-style: normal; }
-.hero-sub { color: var(--muted); font-size: 17px; margin-top: 16px; max-width: 440px; }
-.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 36px; }
+.hero h1 em { color: var(--red); font-style: normal; }
+.hero-sub { color: var(--muted); font-size: 17px; margin-top: 16px; max-width: 520px; }
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 36px; }
 .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: var(--r); font-weight: 700; text-decoration: none; font-size: 15px; transition: background .2s, transform .15s; }
 .btn-primary:hover { background: var(--red-dark); transform: translateY(-1px); }
 .btn-outline { background: transparent; color: var(--white); padding: 14px 28px; border-radius: var(--r); font-weight: 600; text-decoration: none; font-size: 15px; border: 1.5px solid var(--border); transition: border-color .2s, transform .15s; display: flex; align-items: center; gap: 8px; }
 .btn-outline:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
 .btn-outline svg { width: 20px; height: 20px; }
 
-/* — chroma video stage — */
-.chroma-stage { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; height: 100%; }
+/* ── PRODUCTO ANIMADO (vídeo croma con scroll) ───────── */
+.chroma-stage-wrapper {
+  position: relative;
+  height: 300vh;
+  background: var(--bg);
+}
+.chroma-stage {
+  position: sticky; top: 0; height: 100svh; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
 video#md-source-video { display: none; }
-.chroma-canvas-holder { position: relative; max-width: 100%; max-height: 90svh; }
-canvas#md-output-canvas { display: block; max-width: 100%; max-height: 90svh; }
+.chroma-canvas-holder { position: relative; max-width: 90%; max-height: 85svh; }
+canvas#md-output-canvas { display: block; max-width: 100%; max-height: 85svh; }
 .md-logo-overlay {
   position: absolute; top: 68%; left: 50%; transform: translate(-50%, -50%);
   text-align: center; pointer-events: none; opacity: 0; transition: opacity .4s ease;
   color: #000000; font-family: Arial, Helvetica, sans-serif;
   text-shadow: 0 1px 3px rgba(255,255,255,0.6), 0 0 1px rgba(255,255,255,0.6);
 }
-.md-logo-main { display: block; font-size: 2.4rem; font-weight: 900; letter-spacing: 0.05em; line-height: 1; -webkit-text-stroke: 0.5px rgba(0,0,0,0.3); }
-.md-logo-sub { display: block; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.2em; margin-top: 2px; }
+.md-logo-main { display: block; font-size: 2.6rem; font-weight: 900; letter-spacing: 0.05em; line-height: 1; -webkit-text-stroke: 0.5px rgba(0,0,0,0.3); }
+.md-logo-sub { display: block; font-size: 1rem; font-weight: 700; letter-spacing: 0.2em; margin-top: 2px; }
 .md-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: Arial, Helvetica, sans-serif; font-size: 0.85rem; letter-spacing: 0.05em; color: var(--muted); }
 
 @media (max-width: 900px) {
-  .hero-split-wrapper { height: 280vh; }
-  .hero-split-sticky {
-    grid-template-columns: 1fr; grid-template-rows: auto 1fr;
-    padding: 90px 20px 16px; gap: 12px;
-  }
-  .chroma-stage { order: 1; max-height: 62svh; }
-  .hero-text { order: 2; text-align: center; padding-right: 0; }
-  .hero-text h1 { max-width: none; margin: 0 auto; font-size: clamp(26px, 7vw, 38px); }
-  .hero-sub { margin-left: auto; margin-right: auto; font-size: 14px; }
-  .hero-ctas { justify-content: center; margin-top: 16px; }
-  .hero-logo { width: 56px; height: 56px; margin-bottom: 12px; margin-left: auto; margin-right: auto; }
-  .chroma-canvas-holder { max-height: 62svh; }
-  canvas#md-output-canvas { max-height: 62svh; }
-  .md-logo-main { font-size: clamp(1.6rem, 9vw, 2.4rem); }
-  .md-logo-sub { font-size: clamp(0.65rem, 3vw, 0.95rem); }
+  .chroma-stage-wrapper { height: 220vh; }
+  .chroma-canvas-holder { max-width: 96%; max-height: 75svh; }
+  canvas#md-output-canvas { max-height: 75svh; }
+  .md-logo-main { font-size: clamp(1.8rem, 9vw, 2.6rem); }
+  .md-logo-sub { font-size: clamp(0.7rem, 3vw, 1rem); }
 }
 
 /* ── TRUST BAR ───────────────────────────── */
@@ -760,30 +755,30 @@ footer {
 </div>
 
 <!-- HERO -->
-<section class="hero-split-wrapper" id="heroSplitWrapper">
-  <div class="hero-split-sticky">
-    <div class="hero-text">
-      <img src="assets/logo.png" alt="MD Nutrition" class="hero-logo">
-      <h1>Suplementos que<br><em>funcionan de verdad.</em></h1>
-      <p class="hero-sub">Tienda física en Madrid con asesoramiento profesional personalizado. Las mejores marcas al mejor precio.</p>
-      <div class="hero-ctas">
-        <a href="#catalogo" class="btn-primary">Ver catálogo completo</a>
-        <a href="https://wa.me/34651469908?text=Hola!%20Me%20gustar%C3%ADa%20informarme%20sobre%20vuestros%20suplementos." target="_blank" class="btn-outline">
-          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.554 4.122 1.523 5.854L0 24l6.334-1.508A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.89 0-3.663-.492-5.2-1.354l-.373-.22-3.762.896.931-3.668-.244-.387A10 10 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"></path></svg>
-          Escríbenos ahora
-        </a>
+<section class="hero">
+  <img src="assets/logo.png" alt="MD Nutrition" class="hero-logo">
+  <h1>Suplementos que<br><em>funcionan de verdad.</em></h1>
+  <p class="hero-sub">Tienda física en Madrid con asesoramiento profesional personalizado. Las mejores marcas al mejor precio.</p>
+  <div class="hero-ctas">
+    <a href="#catalogo" class="btn-primary">Ver catálogo completo</a>
+    <a href="https://wa.me/34651469908?text=Hola!%20Me%20gustar%C3%ADa%20informarme%20sobre%20vuestros%20suplementos." target="_blank" class="btn-outline">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.554 4.122 1.523 5.854L0 24l6.334-1.508A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.89 0-3.663-.492-5.2-1.354l-.373-.22-3.762.896.931-3.668-.244-.387A10 10 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"></path></svg>
+      Escríbenos ahora
+    </a>
+  </div>
+</section>
+
+<!-- PRODUCTO ANIMADO -->
+<section class="chroma-stage-wrapper" id="chromaStageWrapper">
+  <div class="chroma-stage">
+    <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto"></video>
+    <div class="chroma-canvas-holder" id="chroma-canvas-holder">
+      <canvas id="md-output-canvas"></canvas>
+      <div class="md-logo-overlay" id="md-logo-overlay">
+        <span class="md-logo-main">MD</span>
+        <span class="md-logo-sub">NUTRITION</span>
       </div>
-    </div>
-    <div class="chroma-stage">
-      <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto"></video>
-      <div class="chroma-canvas-holder" id="chroma-canvas-holder">
-        <canvas id="md-output-canvas"></canvas>
-        <div class="md-logo-overlay" id="md-logo-overlay">
-          <span class="md-logo-main">MD</span>
-          <span class="md-logo-sub">NUTRITION</span>
-        </div>
-        <div class="md-loading" id="md-loading">Cargando…</div>
-      </div>
+      <div class="md-loading" id="md-loading">Cargando…</div>
     </div>
   </div>
 </section>
@@ -1110,7 +1105,7 @@ render();
   const video = document.getElementById('md-source-video');
   const canvas = document.getElementById('md-output-canvas');
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  const wrapper = document.getElementById('heroSplitWrapper');
+  const wrapper = document.getElementById('chromaStageWrapper');
   const stageHolder = document.getElementById('chroma-canvas-holder');
   const logoOverlay = document.getElementById('md-logo-overlay');
   const loadingIndicator = document.getElementById('md-loading');
