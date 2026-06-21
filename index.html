@@ -1140,6 +1140,7 @@ render();
 
   function initFirstFrame() {
     if (firstFrameDone) return;
+    if (video.readyState < 2) return; // todavía no hay datos suficientes, no insistimos en falso
     firstFrameDone = true;
     // En móvil muchos navegadores no decodifican el vídeo para canvas
     // hasta que se ha intentado reproducir un instante.
@@ -1158,17 +1159,17 @@ render();
     }
   }
 
-  // Varias redes de seguridad por si algún navegador no dispara el
-  // evento esperado: comprobamos el estado actual, escuchamos los dos
-  // eventos que indican "ya hay un fotograma listo", y por si nada de
-  // eso llega, forzamos a los 2.5s con lo que haya disponible.
-  if (video.readyState >= 2) {
+  // Varios disparadores en paralelo, y además reintentamos cada 300ms
+  // por si ningún evento llega a disparar en algún navegador. No hay
+  // límite de intentos: si la conexión va lenta, seguimos esperando
+  // con el "Cargando…" visible en vez de rendirnos con un cuadro en
+  // blanco que ya no se actualiza nunca.
+  video.addEventListener('loadeddata', initFirstFrame);
+  video.addEventListener('canplay', initFirstFrame);
+  const readyPoll = setInterval(() => {
+    if (firstFrameDone) { clearInterval(readyPoll); return; }
     initFirstFrame();
-  } else {
-    video.addEventListener('loadeddata', initFirstFrame, { once: true });
-    video.addEventListener('canplay', initFirstFrame, { once: true });
-  }
-  setTimeout(initFirstFrame, 2500);
+  }, 300);
 
   function resizeCanvas() {
     if (!video.videoWidth) return;
