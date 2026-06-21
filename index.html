@@ -436,8 +436,8 @@ canvas#md-output-canvas { display: block; width: 100%; height: auto; }
   color: #000000; font-family: Arial, Helvetica, sans-serif;
   text-shadow: 0 1px 3px rgba(255,255,255,0.6), 0 0 1px rgba(255,255,255,0.6);
 }
-.md-logo-main { display: block; font-size: 2.6rem; font-weight: 900; letter-spacing: 0.05em; line-height: 1; -webkit-text-stroke: 0.5px rgba(0,0,0,0.3); }
-.md-logo-sub { display: block; font-size: 1rem; font-weight: 700; letter-spacing: 0.2em; margin-top: 2px; }
+.md-logo-main { display: block; font-size: 1.4rem; font-weight: 900; letter-spacing: 0.05em; line-height: 1; -webkit-text-stroke: 0.5px rgba(0,0,0,0.3); }
+.md-logo-sub { display: block; font-size: 0.55rem; font-weight: 700; letter-spacing: 0.2em; margin-top: 2px; }
 .md-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: Arial, Helvetica, sans-serif; font-size: 0.85rem; letter-spacing: 0.05em; color: var(--muted); }
 
 /* ── CATALOG CON SHAKER LATERAL ───────── */
@@ -830,8 +830,7 @@ footer {
 
       <!-- Columna derecha: shaker sticky -->
       <div class="catalog-shaker-col">
-        <span class="shaker-label">Mezclado en Madrid</span>
-        <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto" loop></video>
+        <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto"></video>
         <div class="chroma-canvas-holder" id="chroma-canvas-holder">
           <canvas id="md-output-canvas"></canvas>
           <div class="md-logo-overlay" id="md-logo-overlay">
@@ -1118,7 +1117,7 @@ buildChips();
 render();
 </script>
 
-<!-- ── SHAKER ANIMADO (autoplay loop) ─────────────────────── -->
+<!-- ── SHAKER ANIMADO (scroll-driven por catálogo) ─────────────────────── -->
 <script>
 (() => {
   const video = document.getElementById('md-source-video');
@@ -1127,6 +1126,7 @@ render();
   const stageHolder = document.getElementById('chroma-canvas-holder');
   const logoOverlay = document.getElementById('md-logo-overlay');
   const loadingIndicator = document.getElementById('md-loading');
+  const catalogSection = document.getElementById('catalogo');
 
   const SOFTNESS_LO = 5;
   const SOFTNESS_HI = 40;
@@ -1134,13 +1134,16 @@ render();
   const RIGHT_CUT_X = 225;
 
   let canvasW = 0, canvasH = 0;
-  let rafId = null;
-  let isPlaying = false;
+  let duration = 0;
+  let targetTime = 0;
+  let renderedTime = -1;
+  let rafScheduled = false;
+  let ready = false;
 
   function resizeCanvas() {
     if (!video.videoWidth) return;
     const rect = stageHolder.getBoundingClientRect();
-    const w = rect.width || 320;
+    const w = rect.width || 300;
     const scale = w / video.videoWidth;
     canvasW = Math.round(video.videoWidth * scale);
     canvasH = Math.round(video.videoHeight * scale);
@@ -1153,11 +1156,9 @@ render();
     ctx.drawImage(video, 0, 0, canvasW, canvasH);
     const frame = ctx.getImageData(0, 0, canvasW, canvasH);
     const data = frame.data;
-
     const sx = canvasW / video.videoWidth;
     const cutX = HAND_CUT_X * sx;
     const rightCutX = canvasW - RIGHT_CUT_X * sx;
-
     for (let y = 0; y < canvasH; y++) {
       for (let x = 0; x < canvasW; x++) {
         const i = (y * canvasW + x) * 4;
@@ -1178,31 +1179,55 @@ render();
     ctx.putImageData(frame, 0, 0);
   }
 
-  function renderLoop() {
-    drawKeyedFrame();
-    // Logo aparece siempre visible en modo inline
-    logoOverlay.style.opacity = '1';
-    rafId = requestAnimationFrame(renderLoop);
+  function onScroll() {
+    if (!ready || !duration) return;
+    const rect = catalogSection.getBoundingClientRect();
+    const total = catalogSection.offsetHeight - window.innerHeight;
+    const scrolled = -rect.top;
+    let progress = Math.max(0, Math.min(1, scrolled / total));
+    targetTime = progress * duration;
+    logoOverlay.style.opacity = progress > 0.4 ? '1' : '0';
+    scheduleSeek();
   }
 
-  function startPlayback() {
-    if (isPlaying) return;
-    resizeCanvas();
-    if (loadingIndicator) loadingIndicator.style.display = 'none';
+  function scheduleSeek() {
+    if (rafScheduled) return;
+    rafScheduled = true;
+    requestAnimationFrame(() => {
+      rafScheduled = false;
+      if (Math.abs(targetTime - renderedTime) > 1 / 30) {
+        renderedTime = targetTime;
+        video.currentTime = targetTime;
+      }
+    });
+  }
+
+  video.addEventListener('seeked', drawKeyedFrame);
+
+  function init() {
+    if (ready) return;
+    if (video.readyState < 2) return;
+    ready = true;
+    duration = video.duration;
+    // Kick para que el navegador decodifique el primer frame
     const p = video.play();
-    const go = () => { isPlaying = true; if (!rafId) renderLoop(); };
-    if (p && typeof p.then === 'function') { p.then(go).catch(go); } else { go(); }
+    const finish = () => {
+      video.pause();
+      if (loadingIndicator) loadingIndicator.style.display = 'none';
+      resizeCanvas();
+      onScroll();
+    };
+    if (p && typeof p.then === 'function') { p.then(finish).catch(finish); } else { finish(); }
   }
 
-  // Arrancar en cuanto haya datos — varios disparadores por compatibilidad
-  video.addEventListener('canplay', startPlayback);
-  video.addEventListener('loadeddata', startPlayback);
-  // Fallback poll por si los eventos no disparan (Safari, Chrome móvil)
-  const poll = setInterval(() => {
-    if (video.readyState >= 3) { clearInterval(poll); startPlayback(); }
-  }, 200);
+  video.addEventListener('loadeddata', init);
+  video.addEventListener('canplay', init);
+  const poll = setInterval(() => { if (ready) { clearInterval(poll); return; } init(); }, 300);
 
-  window.addEventListener('resize', () => { resizeCanvas(); });
+  video.addEventListener('loadedmetadata', () => { duration = video.duration; });
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', () => { resizeCanvas(); drawKeyedFrame(); });
 })();
 </script>
 
