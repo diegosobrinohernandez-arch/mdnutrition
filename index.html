@@ -1134,30 +1134,41 @@ render();
   video.addEventListener('loadedmetadata', () => {
     duration = video.duration;
     resizeCanvas();
+  });
+
+  let firstFrameDone = false;
+
+  function initFirstFrame() {
+    if (firstFrameDone) return;
+    firstFrameDone = true;
     // En móvil muchos navegadores no decodifican el vídeo para canvas
     // hasta que se ha intentado reproducir un instante.
     const kickstart = video.play();
-    if (kickstart && typeof kickstart.then === 'function') {
-      kickstart.then(() => {
-        video.pause();
-        if (loadingIndicator) loadingIndicator.style.display = 'none';
-        resizeCanvas();
-        drawKeyedFrame();
-        onScroll();
-      }).catch(() => {
-        if (loadingIndicator) loadingIndicator.style.display = 'none';
-        resizeCanvas();
-        drawKeyedFrame();
-        onScroll();
-      });
-    } else {
+    const finish = () => {
       video.pause();
       if (loadingIndicator) loadingIndicator.style.display = 'none';
       resizeCanvas();
       drawKeyedFrame();
       onScroll();
+    };
+    if (kickstart && typeof kickstart.then === 'function') {
+      kickstart.then(finish).catch(finish);
+    } else {
+      finish();
     }
-  });
+  }
+
+  // Varias redes de seguridad por si algún navegador no dispara el
+  // evento esperado: comprobamos el estado actual, escuchamos los dos
+  // eventos que indican "ya hay un fotograma listo", y por si nada de
+  // eso llega, forzamos a los 2.5s con lo que haya disponible.
+  if (video.readyState >= 2) {
+    initFirstFrame();
+  } else {
+    video.addEventListener('loadeddata', initFirstFrame, { once: true });
+    video.addEventListener('canplay', initFirstFrame, { once: true });
+  }
+  setTimeout(initFirstFrame, 2500);
 
   function resizeCanvas() {
     if (!video.videoWidth) return;
