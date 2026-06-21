@@ -467,9 +467,45 @@ canvas#md-output-canvas { display: block; width: 100%; height: auto; }
   text-align: center;
 }
 
+.shaker-mobile-caption {
+  display: none;
+  text-align: center;
+  margin-top: 12px;
+}
+.shaker-mobile-brand {
+  display: block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--white);
+}
+.shaker-mobile-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
 @media (max-width: 1050px) {
   .catalog-with-shaker { grid-template-columns: 1fr; }
-  .catalog-shaker-col { display: none; }
+  .catalog-shaker-col {
+    position: static;
+    order: -1;
+    width: 60%;
+    max-width: 280px;
+    margin: 0 auto 32px;
+  }
+  .catalog-shaker-col .md-logo-overlay { display: none; }
+  .shaker-mobile-caption { display: block; }
+}
+
+@media (max-width: 600px) {
+  .catalog-shaker-col {
+    width: 70%;
+    max-width: 240px;
+  }
 }
 
 /* ── TRUST BAR ───────────────────────────── */
@@ -841,6 +877,10 @@ footer {
           </div>
           <div class="md-loading" id="md-loading">Cargando…</div>
         </div>
+        <div class="shaker-mobile-caption">
+          <span class="shaker-mobile-brand">MD NUTRITION</span>
+          <span class="shaker-mobile-sub">Suplementos que funcionan de verdad</span>
+        </div>
       </div>
     </div>
   </div>
@@ -1177,8 +1217,11 @@ render();
     ctx.putImageData(frame, 0, 0);
   }
 
+  function isMobile() { return window.innerWidth <= 1050; }
+
   function onScroll() {
     if (!ready || !duration) return;
+    if (isMobile()) return; // en móvil frame estático, no scroll
     const rect = catalogSection.getBoundingClientRect();
     const total = catalogSection.offsetHeight - window.innerHeight;
     const scrolled = -rect.top;
@@ -1207,13 +1250,17 @@ render();
     if (video.readyState < 2) return;
     ready = true;
     duration = video.duration;
-    // Kick para que el navegador decodifique el primer frame
     const p = video.play();
     const finish = () => {
       video.pause();
       if (loadingIndicator) loadingIndicator.style.display = 'none';
       resizeCanvas();
-      onScroll();
+      if (isMobile()) {
+        // Frame estático: mitad del vídeo donde el shaker ya está lleno
+        video.currentTime = duration * 0.6;
+      } else {
+        onScroll();
+      }
     };
     if (p && typeof p.then === 'function') { p.then(finish).catch(finish); } else { finish(); }
   }
