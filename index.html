@@ -399,59 +399,32 @@ body { background: var(--bg); color: var(--white); font-family: 'Inter', system-
 .mobile-menu.open { display: flex; }
 
 /* ── HERO ────────────────────────────────── */
-.hero-wrapper {
-  position: relative;
-  height: 250vh;
-}
 .hero {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  padding: 80px 60px 60px;
-  background: radial-gradient(ellipse 80% 60% at 30% 50%, rgba(220,38,38,0.12) 0%, transparent 70%), var(--bg);
-  position: sticky; top: 0; overflow: hidden;
+  min-height: 100svh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 80px 24px 60px;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(220,38,38,0.12) 0%, transparent 70%), var(--bg);
+  position: relative; overflow: hidden;
 }
 .hero::before {
   content: ''; position: absolute; inset: 0;
   background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
   background-size: 32px 32px; pointer-events: none;
 }
-.hero-content {
-  display: flex; flex-direction: column; align-items: flex-start;
-  text-align: left; z-index: 1;
-}
-.hero-logo { width: 72px; height: 72px; margin-bottom: 24px; object-fit: contain; filter: drop-shadow(0 0 30px rgba(220,38,38,0.5)); }
+.hero-logo { width: 220px; height: 220px; margin-bottom: 32px; object-fit: contain; filter: drop-shadow(0 0 60px rgba(220,38,38,0.5)); }
 .hero h1 {
   font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic;
-  font-size: clamp(42px, 6vw, 80px); line-height: 1; text-transform: uppercase;
+  font-size: clamp(42px, 8vw, 80px); line-height: 1; text-transform: uppercase;
+  max-width: 800px;
 }
 .hero h1 em { color: var(--red); font-style: normal; }
-.hero-sub { color: var(--muted); font-size: 17px; margin-top: 16px; max-width: 420px; }
-.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 36px; }
-.hero-shaker-col {
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1; position: relative;
-}
+.hero-sub { color: var(--muted); font-size: 17px; margin-top: 16px; max-width: 520px; }
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 36px; }
 .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: var(--r); font-weight: 700; text-decoration: none; font-size: 15px; transition: background .2s, transform .15s; }
 .btn-primary:hover { background: var(--red-dark); transform: translateY(-1px); }
 .btn-outline { background: transparent; color: var(--white); padding: 14px 28px; border-radius: var(--r); font-weight: 600; text-decoration: none; font-size: 15px; border: 1.5px solid var(--border); transition: border-color .2s, transform .15s; display: flex; align-items: center; gap: 8px; }
 .btn-outline:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
 .btn-outline svg { width: 20px; height: 20px; }
-
-@media (max-width: 900px) {
-  .hero-wrapper { height: 180vh; }
-  .hero {
-    grid-template-columns: 1fr;
-    text-align: center;
-    padding: 80px 24px 60px;
-  }
-  .hero-content { align-items: center; }
-  .hero-shaker-col { display: none; }
-  .hero-logo { width: 120px; height: 120px; }
-}
 
 /* ── PRODUCTO ANIMADO (inline catálogo) ───────── */
 video#md-source-video { display: none; }
@@ -798,36 +771,18 @@ footer {
 </div>
 
 <!-- HERO -->
-<div class="hero-wrapper" id="heroSection">
 <section class="hero">
-  <!-- Columna izquierda: texto -->
-  <div class="hero-content">
-    <img src="assets/logo.png" alt="MD Nutrition" class="hero-logo">
-    <h1>Suplementos que<br><em>funcionan de verdad.</em></h1>
-    <p class="hero-sub">Tienda física en Madrid con asesoramiento profesional personalizado. Las mejores marcas al mejor precio.</p>
-    <div class="hero-ctas">
-      <a href="#catalogo" class="btn-primary">Ver catálogo completo</a>
-      <a href="https://wa.me/34651469908?text=Hola!%20Me%20gustar%C3%ADa%20informarme%20sobre%20vuestros%20suplementos." target="_blank" class="btn-outline">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.554 4.122 1.523 5.854L0 24l6.334-1.508A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.89 0-3.663-.492-5.2-1.354l-.373-.22-3.762.896.931-3.668-.244-.387A10 10 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"></path></svg>
-        Escríbenos ahora
-      </a>
-    </div>
-  </div>
-
-  <!-- Columna derecha: shaker scroll-driven -->
-  <div class="hero-shaker-col">
-    <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto"></video>
-    <div class="chroma-canvas-holder" id="chroma-canvas-holder">
-      <canvas id="md-output-canvas"></canvas>
-      <div class="md-logo-overlay" id="md-logo-overlay">
-        <span class="md-logo-main">MD</span>
-        <span class="md-logo-sub">NUTRITION</span>
-      </div>
-      <div class="md-loading" id="md-loading">Cargando…</div>
-    </div>
+  <img src="assets/logo.png" alt="MD Nutrition" class="hero-logo">
+  <h1>Suplementos que<br><em>funcionan de verdad.</em></h1>
+  <p class="hero-sub">Tienda física en Madrid con asesoramiento profesional personalizado. Las mejores marcas al mejor precio.</p>
+  <div class="hero-ctas">
+    <a href="#catalogo" class="btn-primary">Ver catálogo completo</a>
+    <a href="https://wa.me/34651469908?text=Hola!%20Me%20gustar%C3%ADa%20informarme%20sobre%20vuestros%20suplementos." target="_blank" class="btn-outline">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.554 4.122 1.523 5.854L0 24l6.334-1.508A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.89 0-3.663-.492-5.2-1.354l-.373-.22-3.762.896.931-3.668-.244-.387A10 10 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"></path></svg>
+      Escríbenos ahora
+    </a>
   </div>
 </section>
-</div>
 
 <!-- TRUST BAR -->
 <div class="trust-bar">
@@ -861,7 +816,7 @@ footer {
       <p class="section-desc">539 productos reales de las mejores marcas: Life Pro, Amix, Big, Vit O Best, Weider y más. Filtra por marca o categoría y consulta disponibilidad directamente por WhatsApp.</p>
     </div>
 
-    <!-- Layout dos columnas: solo filtros | shaker -->
+    <!-- Layout dos columnas: filtros | shaker -->
     <div class="catalog-with-shaker">
       <!-- Columna izquierda: buscador + marcas + chips -->
       <div class="catalog-filters">
@@ -873,6 +828,19 @@ footer {
         </div>
         <div class="brand-row" id="brandRow"></div>
         <div class="cat-chips" id="catChips"></div>
+      </div>
+
+      <!-- Columna derecha: shaker en bucle -->
+      <div class="catalog-shaker-col">
+        <video id="md-source-video" src="assets/md-shaker-final.mp4" muted playsinline preload="auto" loop></video>
+        <div class="chroma-canvas-holder" id="chroma-canvas-holder">
+          <canvas id="md-output-canvas"></canvas>
+          <div class="md-logo-overlay" id="md-logo-overlay">
+            <span class="md-logo-main">MD</span>
+            <span class="md-logo-sub">NUTRITION</span>
+          </div>
+          <div class="md-loading" id="md-loading">Cargando…</div>
+        </div>
       </div>
     </div>
 
@@ -1151,7 +1119,7 @@ buildChips();
 render();
 </script>
 
-<!-- ── SHAKER ANIMADO (scroll-driven hero) ─────────────────────── -->
+<!-- ── SHAKER ANIMADO (autoplay loop) ─────────────────────── -->
 <script>
 (() => {
   const video = document.getElementById('md-source-video');
@@ -1160,29 +1128,30 @@ render();
   const stageHolder = document.getElementById('chroma-canvas-holder');
   const logoOverlay = document.getElementById('md-logo-overlay');
   const loadingIndicator = document.getElementById('md-loading');
-  const heroSection = document.getElementById('heroSection');
-
   const SOFTNESS_LO = 5;
   const SOFTNESS_HI = 40;
   const HAND_CUT_X = 225;
   const RIGHT_CUT_X = 225;
 
   let canvasW = 0, canvasH = 0;
-  let duration = 0;
-  let targetTime = 0;
-  let renderedTime = -1;
-  let rafScheduled = false;
-  let ready = false;
+  let rafId = null;
+  let playing = false;
 
   function resizeCanvas() {
     if (!video.videoWidth) return;
     const rect = stageHolder.getBoundingClientRect();
-    const w = rect.width || 400;
+    const w = rect.width || 300;
     const scale = w / video.videoWidth;
     canvasW = Math.round(video.videoWidth * scale);
     canvasH = Math.round(video.videoHeight * scale);
     canvas.width = canvasW;
     canvas.height = canvasH;
+    const fontSize = Math.round(canvasW * 0.18);
+    const subSize = Math.round(canvasW * 0.07);
+    const logoMain = document.querySelector('.md-logo-main');
+    const logoSub = document.querySelector('.md-logo-sub');
+    if (logoMain) logoMain.style.fontSize = fontSize + 'px';
+    if (logoSub) logoSub.style.fontSize = subSize + 'px';
   }
 
   function drawKeyedFrame() {
@@ -1217,58 +1186,30 @@ render();
     ctx.putImageData(frame, 0, 0);
   }
 
-  function onScroll() {
-    if (!ready || !duration) return;
-    const rect = heroSection.getBoundingClientRect();
-    const total = heroSection.offsetHeight - window.innerHeight;
-    const scrolled = -rect.top;
-    let progress = Math.max(0, Math.min(1, scrolled / total));
-    targetTime = progress * duration;
-    logoOverlay.style.opacity = progress > 0.55 ? '1' : '0';
-    scheduleSeek();
-  }
-  function scheduleSeek() {
-    if (rafScheduled) return;
-    rafScheduled = true;
-    requestAnimationFrame(() => {
-      rafScheduled = false;
-      if (Math.abs(targetTime - renderedTime) > 1 / 30) {
-        renderedTime = targetTime;
-        video.currentTime = targetTime;
-      }
-    });
+  function renderLoop() {
+    drawKeyedFrame();
+    rafId = requestAnimationFrame(renderLoop);
   }
 
-  video.addEventListener('seeked', drawKeyedFrame);
-  video.addEventListener('loadedmetadata', () => { duration = video.duration; });
-
-  function init() {
-    if (ready) return;
-    if (video.readyState < 2) return;
-    ready = true;
-    duration = video.duration || duration;
-    // Kick play/pause para que el navegador decodifique el primer frame
+  function start() {
+    if (playing) return;
+    playing = true;
+    resizeCanvas();
+    if (loadingIndicator) loadingIndicator.style.display = 'none';
+    logoOverlay.style.opacity = '1';
     const p = video.play();
-    const finish = () => {
-      video.pause();
-      video.currentTime = 0;
-      if (loadingIndicator) loadingIndicator.style.display = 'none';
-      resizeCanvas();
-      drawKeyedFrame();
-    };
-    if (p && typeof p.then === 'function') { p.then(finish).catch(finish); } else { finish(); }
+    const go = () => { if (!rafId) renderLoop(); };
+    if (p && typeof p.then === 'function') { p.then(go).catch(go); } else { go(); }
   }
 
-  // Precarga inmediata — varios disparadores en paralelo
-  video.addEventListener('loadeddata', init);
-  video.addEventListener('canplay', init);
+  video.addEventListener('canplay', start);
+  video.addEventListener('loadeddata', start);
   const poll = setInterval(() => {
-    if (ready) { clearInterval(poll); return; }
-    init();
-  }, 150);
+    if (playing) { clearInterval(poll); return; }
+    if (video.readyState >= 3) { clearInterval(poll); start(); }
+  }, 200);
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', () => { resizeCanvas(); drawKeyedFrame(); });
+  window.addEventListener('resize', () => { resizeCanvas(); });
 })();
 </script>
 
