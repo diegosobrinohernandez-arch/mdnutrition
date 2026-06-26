@@ -587,6 +587,61 @@ canvas#md-output-canvas { display: block; width: 100%; height: auto; }
 .btn-wa:hover { background: var(--wa-dark); }
 .btn-wa svg { width: 16px; height: 16px; flex-shrink: 0; }
 
+.product-card { cursor: pointer; }
+
+/* ── PRODUCT MODAL ────────────────────────── */
+.pmodal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(3px);
+  z-index: 1000; display: none; align-items: flex-start; justify-content: center;
+  padding: 40px 16px; overflow-y: auto;
+}
+.pmodal-overlay.open { display: flex; }
+.pmodal {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  max-width: 880px; width: 100%; margin: auto; position: relative;
+  display: grid; grid-template-columns: 320px 1fr; overflow: hidden;
+  animation: pmodalIn .22s ease;
+}
+@keyframes pmodalIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.pmodal-close {
+  position: absolute; top: 14px; right: 14px; z-index: 5;
+  width: 34px; height: 34px; border-radius: 99px; border: none;
+  background: rgba(0,0,0,0.55); color: #fff; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: background .15s;
+}
+.pmodal-close:hover { background: var(--red); }
+.pmodal-img {
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  padding: 28px; position: relative; min-height: 280px;
+}
+.pmodal-img img { width: 100%; height: 100%; max-height: 380px; object-fit: contain; }
+.pmodal-img .product-img-placeholder svg { width: 48px; height: 48px; }
+.pmodal-brand-badge {
+  position: absolute; top: 14px; left: 14px; background: rgba(0,0,0,0.75);
+  padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; color: #fff; letter-spacing: .5px;
+}
+.pmodal-body { padding: 28px 30px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.pmodal-cat { font-size: 11px; color: var(--red); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+.pmodal-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.15; }
+.pmodal-price { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; }
+.pmodal-desc { color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+.pmodal-section-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--white); margin-top: 4px; display: flex; align-items: center; gap: 6px;
+}
+.pmodal-bullets { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.pmodal-bullets li { font-size: 14px; color: #e5e7eb; padding-left: 18px; position: relative; line-height: 1.45; }
+.pmodal-bullets li::before { content: ''; position: absolute; left: 0; top: 7px; width: 7px; height: 7px; border-radius: 99px; background: var(--red); }
+.pmodal-modo { font-size: 14px; color: #e5e7eb; background: var(--bg-lift); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; line-height: 1.55; }
+.pmodal-fallback { font-size: 14px; color: var(--muted); background: var(--bg-lift); border: 1px solid var(--border); border-radius: 10px; padding: 14px; line-height: 1.6; }
+.pmodal-actions { margin-top: auto; padding-top: 6px; }
+.pmodal-actions .btn-wa { margin-top: 0; padding: 13px 16px; font-size: 14px; }
+@media (max-width: 640px) {
+  .pmodal { grid-template-columns: 1fr; max-width: 94vw; }
+  .pmodal-img { min-height: 200px; padding: 20px; }
+  .pmodal-name { font-size: 21px; }
+}
+
 /* ── OTHERS SECTION ──────────────────────── */
 .others-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
 .other-card {
@@ -973,12 +1028,21 @@ footer {
   </div>
 </footer>
 
+<!-- PRODUCT MODAL -->
+<div class="pmodal-overlay" id="pmodalOverlay">
+  <div class="pmodal" id="pmodal" role="dialog" aria-modal="true">
+    <button class="pmodal-close" id="pmodalClose" aria-label="Cerrar">✕</button>
+    <div id="pmodalContent"></div>
+  </div>
+</div>
+
 <!-- FLOATING WHATSAPP -->
 <a class="float-wa" href="https://wa.me/34651469908?text=Hola!%20Me%20gustar%C3%ADa%20informarme%20sobre%20vuestros%20suplementos." target="_blank" title="Escríbenos por WhatsApp">
   <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.554 4.122 1.523 5.854L0 24l6.334-1.508A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.89 0-3.663-.492-5.2-1.354l-.373-.22-3.762.896.931-3.668-.244-.387A10 10 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"></path></svg>
 </a>
 
 <script src="assets/app.js"></script>
+<script src="assets/product-details.js"></script>
 <script>
 // Mobile menu
 const ham = document.getElementById('hamburger');
@@ -1009,7 +1073,7 @@ window.imgFail = imgFail;
 
 function card(p, big){
   const hasImg = !!p.img;
-  return '<div class="product-card'+(big?' lg':'')+'">'
+  return '<div class="product-card'+(big?' lg':'')+'" data-id="'+esc(p.id)+'">'
     + '<div class="product-img">'
       + '<span class="brand-badge">'+esc(p.brand)+'</span>'
       + (hasImg?'<img src="'+esc(p.img)+'" loading="lazy" alt="'+esc(p.name)+'" onerror="imgFail(this)">':'')
@@ -1019,7 +1083,7 @@ function card(p, big){
       + '<span class="product-type">'+esc(p.catLabel)+'</span>'
       + '<h3 class="product-name">'+esc(p.name)+'</h3>'
       + (p.price?'<p class="product-price">'+esc(p.price)+'</p>':'')
-      + '<a class="btn-wa" href="https://wa.me/'+WA_NUM+'?text='+p.wa+'" target="_blank" rel="noopener">'+WA_SVG+'Consultar por WhatsApp</a>'
+      + '<a class="btn-wa" href="https://wa.me/'+WA_NUM+'?text='+p.wa+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+WA_SVG+'Consultar por WhatsApp</a>'
     + '</div>'
   + '</div>';
 }
@@ -1117,6 +1181,63 @@ let st; searchEl.addEventListener('input',()=>{ clearTimeout(st); st=setTimeout(
 buildBrandRow();
 buildChips();
 render();
+
+// ── PRODUCT MODAL ──────────────────────────
+const DETAILS = (window.PRODUCT_DETAILS||{});
+const pOverlay = document.getElementById('pmodalOverlay');
+const pContent = document.getElementById('pmodalContent');
+
+function openModal(id){
+  const p = DATA.find(x=>x.id===id);
+  if(!p) return;
+  const d = DETAILS[id];
+  const hasImg = !!p.img;
+
+  let html = '<div class="pmodal-img">'
+    + '<span class="pmodal-brand-badge">'+esc(p.brand)+'</span>'
+    + (hasImg?'<img src="'+esc(p.img)+'" alt="'+esc(p.name)+'" onerror="imgFail(this)">':'')
+    + '<div class="product-img-placeholder"'+(hasImg?' style="display:none"':'')+'>'+PH_SVG+'<span>Foto próximamente</span></div>'
+  + '</div>';
+
+  html += '<div class="pmodal-body">'
+    + '<span class="pmodal-cat">'+esc(p.catLabel)+'</span>'
+    + '<h2 class="pmodal-name">'+esc(p.name)+'</h2>'
+    + (p.price?'<p class="pmodal-price">'+esc(p.price)+'</p>':'');
+
+  if(d){
+    html += '<p class="pmodal-desc">'+esc(d.desc)+'</p>';
+    if(d.bullets && d.bullets.length){
+      html += '<div class="pmodal-section-title">Lo más destacado</div>'
+        + '<ul class="pmodal-bullets">'+d.bullets.map(b=>'<li>'+esc(b)+'</li>').join('')+'</ul>';
+    }
+    if(d.modo){
+      html += '<div class="pmodal-section-title">Modo de empleo</div>'
+        + '<p class="pmodal-modo">'+esc(d.modo)+'</p>';
+    }
+  } else {
+    html += '<p class="pmodal-fallback">Estamos preparando la ficha detallada de este producto. Mientras tanto, escríbenos por WhatsApp y te contamos todo: sabores disponibles, formato y consejos de uso.</p>';
+  }
+
+  html += '<div class="pmodal-actions"><a class="btn-wa" href="https://wa.me/'+WA_NUM+'?text='+p.wa+'" target="_blank" rel="noopener">'+WA_SVG+'Consultar por WhatsApp</a></div>'
+  + '</div>';
+
+  pContent.innerHTML = html;
+  pOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  pOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('click', e=>{
+  const card = e.target.closest('.product-card');
+  if(card && pOverlay.contains(e.target)===false){ openModal(card.dataset.id); }
+});
+document.getElementById('pmodalClose').addEventListener('click', closeModal);
+pOverlay.addEventListener('click', e=>{ if(e.target===pOverlay) closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 </script>
 
 <!-- ── SHAKER ANIMADO (autoplay loop) ─────────────────────── -->
