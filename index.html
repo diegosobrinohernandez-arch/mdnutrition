@@ -703,17 +703,26 @@ canvas#md-output-canvas { display: block; width: 100%; height: auto; }
 .gallery-bg { background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: 200px 200px;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 260px 220px 220px;
   gap: 8px;
 }
-.gallery-grid .g-big { grid-column: span 2; grid-row: span 2; }
+.gallery-grid .g-1 { grid-column: 1 / 6;  grid-row: 1; }
+.gallery-grid .g-2 { grid-column: 6 / 9;  grid-row: 1; }
+.gallery-grid .g-3 { grid-column: 9 / 13; grid-row: 1; }
+.gallery-grid .g-4 { grid-column: 1 / 5;  grid-row: 2; }
+.gallery-grid .g-5 { grid-column: 5 / 9;  grid-row: 2; }
+.gallery-grid .g-6 { grid-column: 9 / 13; grid-row: 2; }
+.gallery-grid .g-7 { grid-column: 1 / 4;  grid-row: 3; }
+.gallery-grid .g-8 { grid-column: 4 / 8;  grid-row: 3; }
+.gallery-grid .g-9 { grid-column: 8 / 13; grid-row: 3; }
 .gallery-slot {
-  background: repeating-linear-gradient(135deg, #1a1a1a 0px, #1a1a1a 12px, #141414 12px, #141414 24px);
-  border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  background: #111;
+  border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center;
   color: var(--muted); font-size: 12px; flex-direction: column; gap: 8px;
 }
-.gallery-slot img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-slot img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; display: block; }
+.gallery-slot:hover img { transform: scale(1.04); }
 .gallery-slot svg { width: 24px; height: 24px; opacity: 0.3; }
 .gallery-slot span { opacity: 0.4; font-size: 11px; }
 
@@ -810,8 +819,16 @@ footer {
   .about-inner { grid-template-columns: 1fr; }
   .about-badge { display: none; }
   .footer-inner { grid-template-columns: 1fr 1fr; }
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: 160px 160px 160px; }
-  .gallery-grid .g-big { grid-column: span 2; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: 180px 180px 180px 180px 180px; }
+  .gallery-grid .g-1 { grid-column: 1 / 3; grid-row: 1; }
+  .gallery-grid .g-2 { grid-column: 1 / 2; grid-row: 2; }
+  .gallery-grid .g-3 { grid-column: 2 / 3; grid-row: 2; }
+  .gallery-grid .g-4 { grid-column: 1 / 2; grid-row: 3; }
+  .gallery-grid .g-5 { grid-column: 2 / 3; grid-row: 3; }
+  .gallery-grid .g-6 { grid-column: 1 / 3; grid-row: 4; }
+  .gallery-grid .g-7 { grid-column: 1 / 2; grid-row: 5; }
+  .gallery-grid .g-8 { grid-column: 2 / 3; grid-row: 5; }
+  .gallery-grid .g-9 { display: none; }
 }
 @media (max-width: 600px) {
   .trust-bar { flex-direction: column; }
@@ -975,11 +992,15 @@ footer {
       <p class="section-desc">Nuestra tienda en Chamartín, Madrid. Miles de productos en stock, asesoramiento en persona.</p>
     </div>
     <div class="gallery-grid">
-      <div class="gallery-slot g-big"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>Foto tienda principal</span></div>
-      <div class="gallery-slot"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>Estantería proteínas</span></div>
-      <div class="gallery-slot"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>Estantería creatinas</span></div>
-      <div class="gallery-slot"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>Vitaminas y minerales</span></div>
-      <div class="gallery-slot"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>Mostrador</span></div>
+      <div class="gallery-slot g-1"><img src="assets/galeria/tienda-vista-general.jpg" alt="Vista general de la tienda MD Nutrition" loading="lazy"></div>
+      <div class="gallery-slot g-2"><img src="assets/galeria/tienda-vitobest-isolate.jpg" alt="VitoBest Isolate CFM Zero" loading="lazy"></div>
+      <div class="gallery-slot g-3"><img src="assets/galeria/tienda-proteinas-pared.jpg" alt="Pared de proteínas" loading="lazy"></div>
+      <div class="gallery-slot g-4"><img src="assets/galeria/tienda-barras-proteicas.jpg" alt="Barras proteicas Amix Zero Hero" loading="lazy"></div>
+      <div class="gallery-slot g-5"><img src="assets/galeria/tienda-estanteria-general.jpg" alt="Estantería creatinas y aminoácidos" loading="lazy"></div>
+      <div class="gallery-slot g-6"><img src="assets/galeria/tienda-life-pro-estanteria.jpg" alt="Estantería Life Pro Nutrition" loading="lazy"></div>
+      <div class="gallery-slot g-7"><img src="assets/galeria/tienda-pedido-vitobest.jpg" alt="Stock VitoBest" loading="lazy"></div>
+      <div class="gallery-slot g-8"><img src="assets/galeria/tienda-mostrador-frontal.jpg" alt="Mostrador MD Nutrition" loading="lazy"></div>
+      <div class="gallery-slot g-9"><img src="assets/galeria/tienda-estanteria-bcaa.jpg" alt="BCAAs y aminoácidos" loading="lazy"></div>
     </div>
   </div>
 </div>
