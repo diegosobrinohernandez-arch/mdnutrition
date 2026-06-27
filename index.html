@@ -704,18 +704,21 @@ canvas#md-output-canvas { display: block; width: 100%; height: auto; }
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: 260px 220px 220px;
+  grid-template-rows: 260px 220px 220px 220px;
   gap: 8px;
 }
-.gallery-grid .g-1 { grid-column: 1 / 6;  grid-row: 1; }
-.gallery-grid .g-2 { grid-column: 6 / 9;  grid-row: 1; }
-.gallery-grid .g-3 { grid-column: 9 / 13; grid-row: 1; }
-.gallery-grid .g-4 { grid-column: 1 / 5;  grid-row: 2; }
-.gallery-grid .g-5 { grid-column: 5 / 9;  grid-row: 2; }
-.gallery-grid .g-6 { grid-column: 9 / 13; grid-row: 2; }
-.gallery-grid .g-7 { grid-column: 1 / 4;  grid-row: 3; }
-.gallery-grid .g-8 { grid-column: 4 / 8;  grid-row: 3; }
-.gallery-grid .g-9 { grid-column: 8 / 13; grid-row: 3; }
+.gallery-grid .g-1  { grid-column: 1 / 6;  grid-row: 1; }
+.gallery-grid .g-2  { grid-column: 6 / 9;  grid-row: 1; }
+.gallery-grid .g-3  { grid-column: 9 / 13; grid-row: 1; }
+.gallery-grid .g-4  { grid-column: 1 / 5;  grid-row: 2; }
+.gallery-grid .g-5  { grid-column: 5 / 9;  grid-row: 2; }
+.gallery-grid .g-6  { grid-column: 9 / 13; grid-row: 2; }
+.gallery-grid .g-7  { grid-column: 1 / 4;  grid-row: 3; }
+.gallery-grid .g-8  { grid-column: 4 / 8;  grid-row: 3; }
+.gallery-grid .g-9  { grid-column: 8 / 13; grid-row: 3; }
+.gallery-grid .g-10 { grid-column: 1 / 5;  grid-row: 4; }
+.gallery-grid .g-11 { grid-column: 5 / 9;  grid-row: 4; }
+.gallery-grid .g-12 { grid-column: 9 / 13; grid-row: 4; }
 .gallery-slot {
   background: #111;
   border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center;
@@ -819,16 +822,19 @@ footer {
   .about-inner { grid-template-columns: 1fr; }
   .about-badge { display: none; }
   .footer-inner { grid-template-columns: 1fr 1fr; }
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: 180px 180px 180px 180px 180px; }
-  .gallery-grid .g-1 { grid-column: 1 / 3; grid-row: 1; }
-  .gallery-grid .g-2 { grid-column: 1 / 2; grid-row: 2; }
-  .gallery-grid .g-3 { grid-column: 2 / 3; grid-row: 2; }
-  .gallery-grid .g-4 { grid-column: 1 / 2; grid-row: 3; }
-  .gallery-grid .g-5 { grid-column: 2 / 3; grid-row: 3; }
-  .gallery-grid .g-6 { grid-column: 1 / 3; grid-row: 4; }
-  .gallery-grid .g-7 { grid-column: 1 / 2; grid-row: 5; }
-  .gallery-grid .g-8 { grid-column: 2 / 3; grid-row: 5; }
-  .gallery-grid .g-9 { display: none; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(7, 160px); }
+  .gallery-grid .g-1  { grid-column: 1 / 3; grid-row: 1; }
+  .gallery-grid .g-2  { grid-column: 1 / 2; grid-row: 2; }
+  .gallery-grid .g-3  { grid-column: 2 / 3; grid-row: 2; }
+  .gallery-grid .g-4  { grid-column: 1 / 2; grid-row: 3; }
+  .gallery-grid .g-5  { grid-column: 2 / 3; grid-row: 3; }
+  .gallery-grid .g-6  { grid-column: 1 / 3; grid-row: 4; }
+  .gallery-grid .g-7  { grid-column: 1 / 2; grid-row: 5; }
+  .gallery-grid .g-8  { grid-column: 2 / 3; grid-row: 5; }
+  .gallery-grid .g-9  { grid-column: 1 / 2; grid-row: 6; }
+  .gallery-grid .g-10 { grid-column: 2 / 3; grid-row: 6; }
+  .gallery-grid .g-11 { grid-column: 1 / 2; grid-row: 7; }
+  .gallery-grid .g-12 { grid-column: 2 / 3; grid-row: 7; }
 }
 @media (max-width: 600px) {
   .trust-bar { flex-direction: column; }
@@ -919,10 +925,10 @@ footer {
 
 <!-- TRUST BAR -->
 <div class="trust-bar">
-  <div class="trust-item"><span class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FCD34D"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span><div class="trust-text"><strong>5.0 Google</strong><span>+135 reseñas verificadas</span></div></div>
+  <div class="trust-item"><span class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" stroke-linecap="round"></path></svg></span><div class="trust-text"><strong>Stock garantizado</strong><span>Si no hay, lo pedimos</span></div></div>
   <div class="trust-item"><span class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.5 6.5h11M6.5 9.5h11M9 3v18M15 3v18" stroke-linecap="round"></path><rect x="4" y="3" width="16" height="18" rx="2"></rect></svg></span><div class="trust-text"><strong>Asesoramiento pro</strong><span>Personal trainer certificado</span></div></div>
   <div class="trust-item"><span class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="9" r="2.5"></circle></svg></span><div class="trust-text"><strong>Tienda física</strong><span>Chamartín, Madrid</span></div></div>
-  <div class="trust-item"><span class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" stroke-linecap="round"></path></svg></span><div class="trust-text"><strong>Stock garantizado</strong><span>Si no hay, lo pedimos</span></div></div>
+  <div class="trust-item"><span class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FCD34D"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span><div class="trust-text"><strong>5.0 Google</strong><span>+135 reseñas verificadas</span></div></div>
 </div>
 
 <!-- BRANDS -->
@@ -1001,6 +1007,9 @@ footer {
       <div class="gallery-slot g-7"><img src="assets/tienda-pedido-vitobest.jpg" alt="Stock VitoBest" loading="lazy"></div>
       <div class="gallery-slot g-8"><img src="assets/tienda-mostrador-frontal.jpg" alt="Mostrador MD Nutrition" loading="lazy"></div>
       <div class="gallery-slot g-9"><img src="assets/tienda-estanteria-bcaa.jpg" alt="BCAAs y aminoácidos" loading="lazy"></div>
+      <div class="gallery-slot g-10"><img src="assets/tienda-be-levels-display.jpg" alt="Display be levels" loading="lazy"></div>
+      <div class="gallery-slot g-11"><img src="assets/tienda-mesa-productos.jpg" alt="Mesa de productos" loading="lazy"></div>
+      <div class="gallery-slot g-12"><img src="assets/tienda-mostrador-interior.jpg" alt="Interior tienda" loading="lazy"></div>
     </div>
   </div>
 </div>
