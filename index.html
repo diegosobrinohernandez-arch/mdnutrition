@@ -643,6 +643,19 @@ canvas#md-output-canvas { display: block; width: 100%; height: auto; }
 .pmodal-fallback { font-size: 13.5px; color: var(--muted); background: var(--bg-lift); border: 1px solid var(--border); border-radius: 10px; padding: 14px; line-height: 1.6; }
 .pmodal-actions { margin-top: auto; padding-top: 4px; }
 .pmodal-actions .btn-wa { margin-top: 0; padding: 13px 16px; font-size: 14px; }
+.pmodal-selectors { display: flex; flex-direction: column; gap: 10px; margin: 12px 0 4px; }
+.pmodal-select-label { font-size: 11px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.pmodal-select {
+  width: 100%; padding: 9px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg-lift);
+  color: #fff; font-size: 14px; font-family: inherit; cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
+}
+.pmodal-select:focus { outline: none; border-color: var(--red); }
+.pmodal-select option { background: #1a1a1a; }
 
 /* Modal en móvil: layout vertical optimizado */
 @media (max-width: 640px) {
@@ -1278,11 +1291,23 @@ const DETAILS = (window.PRODUCT_DETAILS||{});
 const pOverlay = document.getElementById('pmodalOverlay');
 const pContent = document.getElementById('pmodalContent');
 
+function buildWaText(p, variantLabel, flavorLabel){
+  let txt = 'Hola! Me interesa "'+p.name+'" ('+p.brand+')';
+  if(variantLabel) txt += ' — Tamaño: '+variantLabel;
+  if(flavorLabel) txt += ' — Sabor: '+flavorLabel;
+  txt += '. ¿Está disponible?';
+  return encodeURIComponent(txt);
+}
+
 function openModal(id){
   const p = DATA.find(x=>x.id===id);
   if(!p) return;
   const d = DETAILS[id];
   const hasImg = !!p.img;
+
+  // Determine initial price
+  let currentPrice = p.price || '';
+  if(p.variants && p.variants.length) currentPrice = p.variants[0].price;
 
   let html = '<div class="pmodal-img">'
     + '<span class="pmodal-brand-badge">'+esc(p.brand)+'</span>'
@@ -1293,7 +1318,27 @@ function openModal(id){
   html += '<div class="pmodal-body">'
     + '<span class="pmodal-cat">'+esc(p.catLabel)+'</span>'
     + '<h2 class="pmodal-name">'+esc(p.name)+'</h2>'
-    + (p.price?'<p class="pmodal-price">'+esc(p.price)+'</p>':'');
+    + (currentPrice?'<p class="pmodal-price" id="pmodalPrice">'+esc(currentPrice)+'</p>':'');
+
+  // Selectors
+  const hasVariants = p.variants && p.variants.length > 1;
+  const hasFlavors = p.flavors && p.flavors.length > 1;
+  if(hasVariants || hasFlavors){
+    html += '<div class="pmodal-selectors">';
+    if(hasVariants){
+      html += '<div><div class="pmodal-select-label">Tamaño / Formato</div>'
+        + '<select class="pmodal-select" id="pmodalVariant">'
+        + p.variants.map(v=>'<option value="'+esc(v.price)+'">'+esc(v.label)+' — '+esc(v.price)+'</option>').join('')
+        + '</select></div>';
+    }
+    if(hasFlavors){
+      html += '<div><div class="pmodal-select-label">Sabor</div>'
+        + '<select class="pmodal-select" id="pmodalFlavor">'
+        + p.flavors.map(f=>'<option value="'+esc(f)+'">'+esc(f)+'</option>').join('')
+        + '</select></div>';
+    }
+    html += '</div>';
+  }
 
   if(d){
     html += '<p class="pmodal-desc">'+esc(d.desc)+'</p>';
@@ -1309,10 +1354,28 @@ function openModal(id){
     html += '<p class="pmodal-fallback">Estamos preparando la ficha detallada de este producto. Mientras tanto, escríbenos por WhatsApp y te contamos todo: sabores disponibles, formato y consejos de uso.</p>';
   }
 
-  html += '<div class="pmodal-actions"><a class="btn-wa" href="https://wa.me/'+WA_NUM+'?text='+p.wa+'" target="_blank" rel="noopener">'+WA_SVG+'Consultar por WhatsApp</a></div>'
+  const initialWa = buildWaText(p, hasVariants?p.variants[0].label:'', hasFlavors?p.flavors[0]:'');
+  html += '<div class="pmodal-actions"><a class="btn-wa" id="pmodalWaBtn" href="https://wa.me/'+WA_NUM+'?text='+initialWa+'" target="_blank" rel="noopener">'+WA_SVG+'Consultar por WhatsApp</a></div>'
   + '</div>';
 
   pContent.innerHTML = html;
+
+  // Wire up selectors
+  const variantSel = document.getElementById('pmodalVariant');
+  const flavorSel = document.getElementById('pmodalFlavor');
+  const priceEl = document.getElementById('pmodalPrice');
+  const waBtn = document.getElementById('pmodalWaBtn');
+
+  function updateWa(){
+    const vLabel = variantSel ? variantSel.options[variantSel.selectedIndex].text.split(' — ')[0] : '';
+    const fLabel = flavorSel ? flavorSel.value : '';
+    if(priceEl && variantSel) priceEl.textContent = variantSel.value;
+    if(waBtn) waBtn.href = 'https://wa.me/'+WA_NUM+'?text='+buildWaText(p, vLabel, fLabel);
+  }
+
+  if(variantSel) variantSel.addEventListener('change', updateWa);
+  if(flavorSel) flavorSel.addEventListener('change', updateWa);
+
   pOverlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
