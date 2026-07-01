@@ -268,6 +268,10 @@ textarea { resize: vertical; min-height: 80px; }
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         <span>Stock</span>
       </button>
+      <button class="nav-item" onclick="showPage('tpv')">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        <span>TPV · Caja</span>
+      </button>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
@@ -309,8 +313,92 @@ textarea { resize: vertical; min-height: 80px; }
       <div id="stock-grid-wrap"><div class="spinner">Cargando...</div></div>
     </div>
 
-  </main>
-</div>
+    <!-- TPV -->
+    <div id="page-tpv" class="page">
+      <div class="page-header">
+        <div class="page-title">TPV · <span>Caja</span></div>
+        <button class="btn-red" style="width:auto;padding:10px 20px" onclick="vaciarVenta()">Vaciar venta</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start">
+
+        <!-- Buscador y resultados -->
+        <div>
+          <div style="position:relative;margin-bottom:12px">
+            <input type="text" id="tpv-search" placeholder="Buscar producto por nombre..." autocomplete="off"
+              style="width:100%;padding:12px 16px 12px 40px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;color:var(--white);font-size:15px"
+              oninput="onTpvSearch(this.value)" />
+            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <div id="tpv-results" class="card" style="display:none;overflow:hidden"></div>
+
+          <!-- Historial del día -->
+          <div class="card" style="margin-top:20px">
+            <div class="card-header">
+              <span class="card-title">Ventas de hoy</span>
+              <button class="btn-sm" onclick="loadVentasHoy()">↻ Actualizar</button>
+            </div>
+            <div id="ventas-hoy-wrap"><div class="spinner">Cargando...</div></div>
+          </div>
+        </div>
+
+        <!-- Panel de venta actual -->
+        <div style="position:sticky;top:24px">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Venta actual</span>
+              <span id="tpv-num-items" style="font-size:12px;color:var(--muted)">0 productos</span>
+            </div>
+            <div id="tpv-lineas" style="min-height:100px;padding:8px 0"></div>
+            <div style="padding:16px;border-top:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+                <span style="color:var(--muted);font-size:13px">Total</span>
+                <span id="tpv-total" style="font-size:28px;font-weight:900">0,00€</span>
+              </div>
+              <button id="btn-cobrar" onclick="cobrar()"
+                style="width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer"
+                disabled>Registrar venta</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL AÑADIR AL TPV -->
+    <div class="modal-overlay" id="tpv-modal">
+      <div class="modal" style="max-width:420px">
+        <div class="modal-header">
+          <div class="modal-title" id="tpv-modal-name">—</div>
+          <button class="modal-close" onclick="closeTpvModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="tpv-modal-variante-wrap">
+            <div class="form-group">
+              <label>Tamaño / Formato</label>
+              <select class="modal-select" id="tpv-modal-variante" onchange="updateTpvPrice()" style="width:100%;padding:10px 12px;background:var(--bg-lift);border:1px solid var(--border);border-radius:8px;color:var(--white);font-size:14px;appearance:none"></select>
+            </div>
+          </div>
+          <div id="tpv-modal-sabor-wrap">
+            <div class="form-group">
+              <label>Sabor</label>
+              <select id="tpv-modal-sabor" style="width:100%;padding:10px 12px;background:var(--bg-lift);border:1px solid var(--border);border-radius:8px;color:var(--white);font-size:14px;appearance:none"></select>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+            <div style="display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+              <button onclick="changeTpvQty(-1)" style="width:44px;height:44px;background:var(--bg-lift);border:none;color:var(--white);font-size:20px;cursor:pointer">−</button>
+              <div id="tpv-modal-qty" style="width:50px;text-align:center;font-size:18px;font-weight:700">1</div>
+              <button onclick="changeTpvQty(1)" style="width:44px;height:44px;background:var(--bg-lift);border:none;color:var(--white);font-size:20px;cursor:pointer">+</button>
+            </div>
+            <div id="tpv-price-preview" style="font-size:24px;font-weight:900;color:var(--red)">—</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeTpvModal()">Cancelar</button>
+          <button class="btn-save" onclick="addTpvLinea()">Añadir a la venta</button>
+        </div>
+      </div>
+    </div>
 
 <!-- MODAL PRODUCTO -->
 <div class="modal-overlay" id="prod-modal">
@@ -427,6 +515,7 @@ function showPage(name) {
   document.getElementById(`page-${name}`).classList.add('active');
   event.currentTarget.classList.add('active');
   if (name === 'stock') loadStock();
+  if (name === 'tpv') { loadVentasHoy(); renderTpvLineas(); }
 }
 
 // ── PRODUCTOS ─────────────────────────────────────
@@ -639,13 +728,195 @@ async function loadStock(q = '') {
   const wrap = document.getElementById('stock-grid-wrap');
   wrap.innerHTML = '<div class="spinner">Cargando stock...</div>';
 
-  let url = `${API}/api/admin/productos?limit=50`;
-  if (q) url += `&q=${encodeURIComponent(q)}`;
+  let allProds = [];
+  for (let page = 1; page <= 10; page++) {
+    let url = `${API}/api/admin/productos?limit=100&page=${page}`;
+    if (q) url += `&q=${encodeURIComponent(q)}`;
+    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${TOKEN}` } });
+    const data = await res.json();
+    if (!data.productos?.length) break;
+    allProds = allProds.concat(data.productos);
+    if (allProds.length >= data.total) break;
+  }
 
-  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${TOKEN}` } });
-  const data = await res.json();
-  stockProducts = data.productos || [];
+  stockProducts = allProds;
   renderStockGrid();
+}
+
+// ── TPV ───────────────────────────────────────────
+let tpvLineas = [];
+let tpvModalProd = null;
+let tpvModalQty = 1;
+let tpvSearchTimer;
+
+function onTpvSearch(val) {
+  clearTimeout(tpvSearchTimer);
+  if (!val.trim()) { document.getElementById('tpv-results').style.display = 'none'; return; }
+  tpvSearchTimer = setTimeout(() => searchTpvProds(val), 300);
+}
+
+async function searchTpvProds(q) {
+  const res = await fetch(`${API}/api/catalogo?q=${encodeURIComponent(q)}&limit=8`);
+  const data = await res.json();
+  const el = document.getElementById('tpv-results');
+  el.style.display = 'block';
+
+  if (!data.productos?.length) {
+    el.innerHTML = '<div class="spinner">Sin resultados</div>';
+    return;
+  }
+
+  el.innerHTML = `<table><tbody>${data.productos.map(p => {
+    const price = p.variantes?.length ? p.variantes[0].price : (p.precio_base ? p.precio_base.toFixed(2).replace('.',',') + '€' : '—');
+    return `<tr onclick="openTpvModal(${p.id})" style="cursor:pointer">
+      <td style="width:44px">${p.imagen_url ? `<img style="width:36px;height:36px;border-radius:6px;object-fit:contain;background:var(--bg-lift)" src="${p.imagen_url}" onerror="this.style.display='none'">` : ''}</td>
+      <td><div style="font-weight:600;font-size:13px">${p.nombre}</div><div style="font-size:11px;color:var(--muted)">${p.marca||''}</div></td>
+      <td style="font-weight:700;color:var(--red);white-space:nowrap">${price}</td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+async function openTpvModal(id) {
+  document.getElementById('tpv-results').style.display = 'none';
+  document.getElementById('tpv-search').value = '';
+
+  const res = await fetch(`${API}/api/catalogo/${id}`);
+  const data = await res.json();
+  tpvModalProd = data.producto;
+  tpvModalQty = 1;
+  document.getElementById('tpv-modal-qty').textContent = '1';
+  document.getElementById('tpv-modal-name').textContent = tpvModalProd.nombre;
+
+  const varWrap = document.getElementById('tpv-modal-variante-wrap');
+  const varSel = document.getElementById('tpv-modal-variante');
+  if (tpvModalProd.variantes?.length > 1) {
+    varWrap.style.display = 'block';
+    varSel.innerHTML = tpvModalProd.variantes.map(v => `<option value="${v.price}">${v.label} — ${v.price}</option>`).join('');
+  } else { varWrap.style.display = 'none'; }
+
+  const sabWrap = document.getElementById('tpv-modal-sabor-wrap');
+  const sabSel = document.getElementById('tpv-modal-sabor');
+  if (tpvModalProd.flavors?.length) {
+    sabWrap.style.display = 'block';
+    sabSel.innerHTML = tpvModalProd.flavors.map(f => `<option>${f}</option>`).join('');
+  } else { sabWrap.style.display = 'none'; }
+
+  updateTpvPrice();
+  document.getElementById('tpv-modal').classList.add('open');
+}
+
+function updateTpvPrice() {
+  if (!tpvModalProd) return;
+  const varSel = document.getElementById('tpv-modal-variante');
+  let price = tpvModalProd.precio_base || 0;
+  if (tpvModalProd.variantes?.length > 1 && varSel.value) {
+    price = parseFloat(varSel.value.replace('€','').replace(',','.')) || 0;
+  } else if (tpvModalProd.variantes?.length === 1) {
+    price = parseFloat(tpvModalProd.variantes[0].price.replace('€','').replace(',','.')) || 0;
+  }
+  document.getElementById('tpv-price-preview').textContent = (price * tpvModalQty).toFixed(2).replace('.',',') + '€';
+}
+
+function changeTpvQty(d) {
+  tpvModalQty = Math.max(1, tpvModalQty + d);
+  document.getElementById('tpv-modal-qty').textContent = tpvModalQty;
+  updateTpvPrice();
+}
+
+function closeTpvModal() { document.getElementById('tpv-modal').classList.remove('open'); }
+
+function addTpvLinea() {
+  if (!tpvModalProd) return;
+  const varSel = document.getElementById('tpv-modal-variante');
+  const sabSel = document.getElementById('tpv-modal-sabor');
+  let varLabel = '', price = tpvModalProd.precio_base || 0;
+  if (tpvModalProd.variantes?.length > 1) {
+    varLabel = varSel.options[varSel.selectedIndex].text.split(' — ')[0];
+    price = parseFloat(varSel.value.replace('€','').replace(',','.')) || 0;
+  } else if (tpvModalProd.variantes?.length === 1) {
+    varLabel = tpvModalProd.variantes[0].label;
+    price = parseFloat(tpvModalProd.variantes[0].price.replace('€','').replace(',','.')) || 0;
+  }
+  tpvLineas.push({
+    producto_id: tpvModalProd.id, nombre: tpvModalProd.nombre, img: tpvModalProd.imagen_url,
+    variante: varLabel, sabor: tpvModalProd.flavors?.length ? sabSel.value : '',
+    precio: price, cantidad: tpvModalQty
+  });
+  closeTpvModal();
+  renderTpvLineas();
+}
+
+function renderTpvLineas() {
+  const el = document.getElementById('tpv-lineas');
+  const btn = document.getElementById('btn-cobrar');
+  const total = tpvLineas.reduce((s,l) => s + l.precio * l.cantidad, 0);
+  document.getElementById('tpv-total').textContent = total.toFixed(2).replace('.',',') + '€';
+  document.getElementById('tpv-num-items').textContent = tpvLineas.length + ' producto' + (tpvLineas.length !== 1 ? 's' : '');
+  btn.disabled = !tpvLineas.length;
+
+  if (!tpvLineas.length) { el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">Busca y añade productos</div>'; return; }
+
+  el.innerHTML = tpvLineas.map((l,i) => {
+    const meta = [l.variante, l.sabor].filter(Boolean).join(' · ');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+      ${l.img ? `<img style="width:36px;height:36px;border-radius:6px;object-fit:contain;background:var(--bg-lift);flex-shrink:0" src="${l.img}">` : '<div style="width:36px;height:36px;background:var(--bg-lift);border-radius:6px;flex-shrink:0"></div>'}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;line-height:1.2">${l.nombre}</div>
+        ${meta ? `<div style="font-size:11px;color:var(--muted)">${meta} × ${l.cantidad}</div>` : ''}
+      </div>
+      <div style="font-weight:700;color:var(--red);font-size:13px">${(l.precio*l.cantidad).toFixed(2).replace('.',',')}€</div>
+      <button onclick="removeTpvLinea(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px">×</button>
+    </div>`;
+  }).join('');
+}
+
+function removeTpvLinea(i) { tpvLineas.splice(i,1); renderTpvLineas(); }
+
+function vaciarVenta() {
+  if (tpvLineas.length && !confirm('¿Vaciar la venta actual?')) return;
+  tpvLineas = []; renderTpvLineas();
+}
+
+async function cobrar() {
+  if (!tpvLineas.length) return;
+  const btn = document.getElementById('btn-cobrar');
+  btn.disabled = true; btn.textContent = 'Registrando...';
+  try {
+    const res = await fetch(`${API}/api/ventas`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ canal: 'tienda', lineas: tpvLineas.map(l => ({
+        producto_id: l.producto_id, variante_id: null, sabor_id: null,
+        nombre: l.nombre + (l.variante ? ` (${l.variante})` : '') + (l.sabor ? ` — ${l.sabor}` : ''),
+        precio: l.precio, cantidad: l.cantidad
+      }))})
+    });
+    if ((await res.json()).ok) {
+      tpvLineas = []; renderTpvLineas();
+      btn.textContent = '✓ Venta registrada'; btn.style.background = 'var(--green)';
+      setTimeout(() => { btn.textContent = 'Registrar venta'; btn.style.background = ''; }, 2000);
+      loadVentasHoy();
+    }
+  } catch { btn.textContent = 'Error · reintentar'; btn.disabled = false; }
+}
+
+async function loadVentasHoy() {
+  const wrap = document.getElementById('ventas-hoy-wrap');
+  if (!wrap) return;
+  const res = await fetch(`${API}/api/ventas/hoy`, { headers: { 'Authorization': `Bearer ${TOKEN}` } });
+  const data = await res.json();
+  const r = data.resumen;
+  if (!data.ventas?.length) { wrap.innerHTML = '<div class="spinner">Sin ventas hoy</div>'; return; }
+
+  wrap.innerHTML = `<div style="padding:12px 16px;background:var(--bg-lift);display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;border-bottom:1px solid var(--border)">
+    <div><div style="font-size:20px;font-weight:900">${r?.num_ventas||0}</div><div style="font-size:11px;color:var(--muted)">Ventas</div></div>
+    <div><div style="font-size:20px;font-weight:900">${r?.unidades_vendidas||0}</div><div style="font-size:11px;color:var(--muted)">Unidades</div></div>
+    <div><div style="font-size:20px;font-weight:900;color:var(--red)">${r?.total_dia ? r.total_dia.toFixed(2).replace('.',',')+'€' : '0€'}</div><div style="font-size:11px;color:var(--muted)">Total</div></div>
+  </div>
+  <table><tbody>${data.ventas.map(v => {
+    const hora = new Date(v.creado_en).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+    return `<tr><td style="color:var(--muted);font-size:12px">${hora}</td><td style="font-size:12px">${v.num_lineas} producto${v.num_lineas>1?'s':''} · ${v.unidades} ud.</td><td style="font-weight:700;color:var(--red);text-align:right">${v.total.toFixed(2).replace('.',',')}€</td></tr>`;
+  }).join('')}</tbody></table>`;
 }
 
 function renderStockGrid() {
